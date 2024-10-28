@@ -12,10 +12,6 @@ export async function GET(req: NextRequest) {
   try {
     const email = req.nextUrl.searchParams.get('email')
 
-    console.log(req.nextUrl.searchParams)
-
-    console.log('email', email)
-
     const existingUsersResult = await db.select()
       .from(usersTable)
       .where(eq(usersTable.email, email as string))
@@ -51,21 +47,15 @@ const ZodCreateTokenRequestBody = z.object({
 type CreateTokenRequestBody = z.infer<typeof ZodCreateTokenRequestBody>
 
 export async function POST(req: NextRequest) {
-  console.log(1)
   try {
     const body: CreateTokenRequestBody = await req.json()
     const data = ZodCreateTokenRequestBody.parse(body)
 
-    console.log(2)
     const existingOrganisationsResult = await db.select().from(organisationsTable).where(eq(organisationsTable.uuid, data.organisationUuid))
     if (existingOrganisationsResult.length === 0) throw new Error("Organisation does not exist")
 
-    console.log(3)
-
     const existingUserEmailResult = await db.select().from(usersTable).where(eq(usersTable.email, data.email));
     if (existingUserEmailResult.length > 0) throw new Error("User email already exists")
-
-    console.log(4)
 
     const createUser = await db.insert(usersTable).values({
       uuid: randomUUID(),
@@ -77,8 +67,6 @@ export async function POST(req: NextRequest) {
 
     const user = createUser[0]
 
-    console.log(5, user)
-
     await db.insert(usersOrganisationsTable).values({
       userUuid: createUser[0].uuid,
       organisationUuid: existingOrganisationsResult[0].uuid,
@@ -86,15 +74,12 @@ export async function POST(req: NextRequest) {
 
     const token = randomBytes(32).toString('hex')
 
-    console.log(6, token)
     await db.insert(tokensTable).values({
       uuid: randomUUID(),
       value: token,
       organisationUuid: existingOrganisationsResult[0].uuid,
       userUuid: user.uuid
     }).returning();
-
-    console.log(7)
 
     if (data.licenseUuid) {
       const updateLicense = await fetch(`${process.env.NEXT_PUBLIC_SALABLE_API_BASE_URL}/licenses/${data.licenseUuid}`, {
