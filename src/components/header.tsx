@@ -46,7 +46,7 @@ export const Header = () => {
                       <Link className='p-3 block f-full border-b hover:bg-gray-50 text-sm' href={'/settings/subscriptions'} onClick={() => setDropDownOpen(false)}>Subscriptions</Link> : null }
                     <Link className='p-3 block f-full border-b hover:bg-gray-50 text-sm' href={'/settings/organisations'} onClick={() => setDropDownOpen(false)}>Organisations</Link>
                     <Link className='p-3 block f-full border-b hover:bg-gray-50 text-sm' href={'/'} onClick={() => setDropDownOpen(false)}>Capabilities</Link>
-                    <Link className='p-3 block f-full border-b hover:bg-gray-50 text-sm' href={'/usage'} onClick={() => setDropDownOpen(false)}>Usage</Link>
+                    {/*<Link className='p-3 block f-full border-b hover:bg-gray-50 text-sm' href={'/usage'} onClick={() => setDropDownOpen(false)}>Usage</Link>*/}
                     <button className='p-3 block f-full text-right hover:bg-gray-50 text-sm' onClick={async () => {
                       try {
                         setLoggingOut(true)

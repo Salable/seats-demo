@@ -105,13 +105,13 @@ export const AssignUser = (
           ) : null}
           {!assignedUser ? (
             <button className='p-2 border-2 rounded-md text-gray-500 text-xs'
-                    onClick={async () => {
-                      const params = new URLSearchParams(searchParams.toString())
-                      params.set("modalOpen", "true")
-                      params.set("licenseUuid", license.uuid)
-                      params.set("subscriptionUuid", subscriptionUuid)
-                      router.push(pathname + '?' + params.toString())
-                    }}
+              onClick={async () => {
+                const params = new URLSearchParams(searchParams.toString())
+                params.set("modalOpen", "true")
+                params.set("licenseUuid", license.uuid)
+                params.set("subscriptionUuid", subscriptionUuid)
+                router.push(pathname + '?' + params.toString())
+              }}
             > Invite user</button>
           ) : null}
         </div>
