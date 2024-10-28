@@ -1,11 +1,12 @@
 import {NextRequest, NextResponse} from "next/server";
 import {env} from "@/app/environment";
+import {salableApiBaseUrl} from "@/app/constants";
 
 export const revalidate = 0
 
 export async function POST(req: NextRequest, params: {params:{uuid: string}}) {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_SALABLE_API_BASE_URL}/subscriptions/${params.params.uuid}/seats`, {
+    const res = await fetch(`${salableApiBaseUrl}/subscriptions/${params.params.uuid}/seats`, {
       method: 'post',
       headers: {
         'x-api-key': env.SALABLE_API_KEY,
@@ -29,7 +30,7 @@ export async function POST(req: NextRequest, params: {params:{uuid: string}}) {
 
 export async function PUT(req: NextRequest,  params: {params:{uuid: string}}) {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_SALABLE_API_BASE_URL}/subscriptions/${params.params.uuid}/seats`, {
+    const res = await fetch(`${salableApiBaseUrl}/subscriptions/${params.params.uuid}/seats`, {
       method: 'put',
       headers: {
         'x-api-key': env.SALABLE_API_KEY,

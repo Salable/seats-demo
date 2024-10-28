@@ -5,12 +5,14 @@ import {getIronSession} from "iron-session";
 import {Session} from "@/app/settings/subscriptions/[uuid]/page";
 import {cookies} from "next/headers";
 import {z} from "zod";
+import {salableApiBaseUrl, salableBasicUsagePlanUuid} from "@/app/constants";
 
 
 export async function GET(req: NextRequest) {
   const session = await getIronSession<Session>(cookies(), { password: 'Q2cHasU797hca8iQ908vsLTdeXwK3BdY', cookieName: "salable-session" });
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_SALABLE_API_BASE_URL}/usage?planUuid=${process.env.NEXT_PUBLIC_SALABLE_USAGE_PLAN_UUID}&granteeId=${session?.uuid}`, {
+    const planUuid = req.nextUrl.searchParams.get('planUuid')
+    const res = await fetch(`${salableApiBaseUrl}/usage/current?planUuid=${planUuid}&granteeId=${session?.uuid}`, {
       headers: {
         'x-api-key': env.SALABLE_API_KEY,
         version: 'v2',
@@ -43,7 +45,7 @@ export async function PUT(req: NextRequest) {
     const body: UpdateUsageBody = await req.json()
     const data = ZodUpdateUsageRequestBody.parse(body)
 
-    const res = await fetch(`${process.env.NEXT_PUBLIC_SALABLE_API_BASE_URL}/usage`, {
+    const res = await fetch(`${salableApiBaseUrl}/usage`, {
       method: "PUT",
       headers: {
         'x-api-key': env.SALABLE_API_KEY,
@@ -51,7 +53,7 @@ export async function PUT(req: NextRequest) {
         'unique-key': randomUUID()
       },
       body: JSON.stringify({
-        planUuid: process.env.NEXT_PUBLIC_SALABLE_USAGE_PLAN_UUID,
+        planUuid: salableBasicUsagePlanUuid,
         granteeId: session.uuid,
         countOptions: {
           increment: data.increment

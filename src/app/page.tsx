@@ -11,6 +11,7 @@ import useSWR from "swr";
 import {Session} from "@/app/settings/subscriptions/[uuid]/page";
 import {CrossIcon} from "@/components/icons/cross-icon";
 import {PlanButton} from "@/components/plan-button";
+import {salableBasicPlanUuid, salableProductUuid, salableProPlanUuid} from "@/app/constants";
 
 export type LicenseCheckResponse = {
   capabilities: string[],
@@ -37,7 +38,7 @@ export default function Home() {
 
 const Main = () => {
   const {data: session, isLoading: isLoadingSession, isValidating: isValidatingSession} = useSWR<Session>(`/api/session`)
-  const {data: licenseCheck, isLoading: isLoadingLicenseCheck, isValidating: isValidatingLicenseCheck} = useSWR<LicenseCheckResponse>(`/api/licenses/check?productUuid=${process.env.NEXT_PUBLIC_PRODUCT_UUID}`)
+  const {data: licenseCheck, isLoading: isLoadingLicenseCheck, isValidating: isValidatingLicenseCheck} = useSWR<LicenseCheckResponse>(`/api/licenses/check?productUuid=${salableProductUuid}`)
   return (
     <>
       <div className='max-w-[1000px] m-auto'>
@@ -77,13 +78,13 @@ const Main = () => {
                   <div>
                     {!isLoadingSession && !session?.uuid ? (
                       <Link
-                        href={"/sign-up?planUuid=" + process.env.NEXT_PUBLIC_SALABLE_BASIC_PLAN_UUID}
+                        href={"/sign-up?planUuid=" + salableBasicPlanUuid}
                         className='block p-4 text-white rounded-md leading-none bg-blue-700 w-full text-center'
                       >
                         Sign up
                       </Link>
                     ) : (
-                      <PlanButton uuid={process.env.NEXT_PUBLIC_SALABLE_BASIC_PLAN_UUID as string} />
+                      <PlanButton uuid={salableBasicPlanUuid} />
                     )}
                   </div>
                 </div>
@@ -120,13 +121,13 @@ const Main = () => {
                   <div>
                     {!isLoadingSession && !session?.uuid ? (
                       <Link
-                        href={"/sign-up?planUuid=" + process.env.NEXT_PUBLIC_SALABLE_PLAN_UUID}
+                        href={`/sign-up?planUuid=${salableProPlanUuid}`}
                         className='block p-4 text-white rounded-md leading-none bg-blue-700 w-full text-center'
                       >
                         Sign up
                       </Link>
                     ) : (
-                      <PlanButton uuid={process.env.NEXT_PUBLIC_SALABLE_PRO_PLAN_UUID as string} />
+                      <PlanButton uuid={salableProPlanUuid} />
                     )}
                   </div>
                 </div>

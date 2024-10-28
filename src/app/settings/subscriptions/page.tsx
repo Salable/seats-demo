@@ -40,10 +40,10 @@ const Main = () => {
               if (a.status === 'CANCELED') return 1
               if (b.status === 'CANCELED') return -1
               return 0
-            }).map((subscription) => (
-              <div className='bg-white mb-3 flex justify-between items-center shadow rounded-sm p-3'>
+            }).map((subscription, index) => (
+              <div className='bg-white mb-3 flex justify-between items-center shadow rounded-sm p-3' key={`subscription-${index}`}>
                 <div className='flex items-center'>
-                  <div className='text-lg mr-2'>{subscription.plan.displayName}</div>
+                  <div className='text-lg mr-2 leading-none'>{subscription.plan.displayName}</div>
                   {subscription.plan.licenseType === 'perSeat' ? <span
                     className='text-sm'>({subscription.quantity} seat{Number(subscription.quantity) > 1 ? "s" : ""})</span> : null}
                 </div>

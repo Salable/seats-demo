@@ -5,6 +5,7 @@ import {organisationsTable, tokensTable, usersOrganisationsTable, usersTable} fr
 import {eq} from "drizzle-orm";
 import {env} from "@/app/environment";
 import {z} from "zod";
+import {salableApiBaseUrl} from "@/app/constants";
 
 export const revalidate = 0
 
@@ -81,7 +82,7 @@ export async function POST(req: NextRequest) {
     }).returning();
 
     if (data.licenseUuid) {
-      const updateLicense = await fetch(`${process.env.NEXT_PUBLIC_SALABLE_API_BASE_URL}/licenses/${data.licenseUuid}`, {
+      const updateLicense = await fetch(`${salableApiBaseUrl}/licenses/${data.licenseUuid}`, {
         method: "PUT",
         headers: {
           'x-api-key': env.SALABLE_API_KEY,

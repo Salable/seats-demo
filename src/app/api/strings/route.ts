@@ -5,6 +5,7 @@ import {getIronSession} from "iron-session";
 import {Session} from "@/app/settings/subscriptions/[uuid]/page";
 import {cookies} from "next/headers";
 import {z} from "zod";
+import {salableApiBaseUrl, salableBasicUsagePlanUuid} from "@/app/constants";
 
 const ZodCreateStringRequestBody = z.object({
   bytes: z.union([z.literal(16), z.literal(32), z.literal(64)]),
@@ -22,18 +23,18 @@ export async function POST(req: NextRequest) {
     let increment: number
     switch (data.bytes) {
       case 16 :
-        increment = 1
+        increment = 1000
         break
       case 32 :
-        increment = 2
+        increment = 2000
         break
       case 64 :
-        increment = 3
+        increment = 3000
         break
       default: throw Error("Unknown bytes int")
     }
 
-    const res = await fetch(`${process.env.NEXT_PUBLIC_SALABLE_API_BASE_URL}/usage`, {
+    const res = await fetch(`${salableApiBaseUrl}/usage`, {
       method: "PUT",
       headers: {
         'x-api-key': env.SALABLE_API_KEY,
@@ -41,7 +42,7 @@ export async function POST(req: NextRequest) {
         'unique-key': randomUUID()
       },
       body: JSON.stringify({
-        planUuid: process.env.NEXT_PUBLIC_SALABLE_USAGE_PLAN_UUID,
+        planUuid: salableBasicUsagePlanUuid,
         granteeId: session.uuid,
         countOptions: {
           increment

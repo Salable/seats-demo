@@ -8,6 +8,13 @@ import {AssignUser} from "@/components/assign-user";
 import {useRouter, useSearchParams} from "next/navigation";
 import {Modal} from "@/components/modal";
 import {SalableSubscription} from "@/app/api/subscriptions/route";
+import {
+  appBaseUrl,
+  salableBasicPlanUuid,
+  salableBasicUsagePlanUuid,
+  salableProPlanUuid,
+  salableProUsagePlanUuid
+} from "@/app/constants";
 
 export type User = {
   uuid: string;
@@ -60,6 +67,7 @@ const Main = ({uuid}: {uuid: string}) => {
   const [disableButton, setDisableButton] = useState(false)
   const [updatedLicenseCount, setUpdatedLicenseCount] = useState<number | null>(null)
   const [isCancellingSubscription, setIsCancellingSubscription] = useState<boolean>(false)
+  const [isReactivatingSubscription, setIsReactivatingSubscription] = useState<boolean>(false)
   const [isChangingSubscription, setIsChangingSubscription] = useState<boolean>(false)
   const [isChangingSeatCount, setIsChangingSeatCount] = useState<boolean>(false)
   const [changingPlanUuid, setChangingPlanUuid] = useState<string | null>(null)
@@ -69,9 +77,27 @@ const Main = ({uuid}: {uuid: string}) => {
   const {data: subscription, mutate: mutateSubscription } = useSWR<SalableSubscription>(`/api/subscriptions/${uuid}`)
   const {data: licenses, mutate: mutateLicenses, isLoading: isLoadingLicenses, isValidating: isValidatingLicenses} = useSWR<GetAllLicensesResponse>(`/api/licenses?subscriptionUuid=${uuid}${subscription?.status !== 'CANCELED' ? "&status=active" : ""}`)
   const {data: licenseCount, mutate: mutateLicenseCount, isLoading: isLoadingLicenseCount,  isValidating: isValidatingLicenseCount} = useSWR<GetLicensesCountResponse>(`/api/licenses/count?subscriptionUuid=${uuid}&status=active`)
-  const {data: usageOnLicense} = useSWR<{unitCount: number; updatedAt: string}>(`/api/usage`)
-
-  const daysLeftInCycle = subscription ? Math.floor(Math.abs(new Date(subscription.expiryDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) : null;
+  const {data: invoices, mutate: mutateInvoices, isLoading: isLoadingInvoices,  isValidating: isValidatingInvoices} = useSWR<{
+    first: string;
+    last: string;
+    hasMore: boolean;
+    data: {
+      created: number;
+      effective_at: number;
+      automatically_finalizes_at: number;
+      hosted_invoice_url: string;
+      invoice_pdf: string;
+      lines: {
+        data: {
+          amount: number;
+          price: {
+            unit_amount: 1
+          }
+        }[]
+      }
+    }[]
+  }>(`/api/subscriptions/${uuid}/invoices`)
+  const {data: usageOnLicense} = useSWR<{unitCount: number; updatedAt: string}>(`/api/usage/current?granteeId=${session?.uuid}&planUuid=${subscription?.planUuid}`)
 
   const date = usageOnLicense?.updatedAt ? new Date(new Date(usageOnLicense.updatedAt)).toLocaleString([], {
     day: "numeric",
@@ -143,10 +169,27 @@ const Main = ({uuid}: {uuid: string}) => {
         method: 'DELETE',
       })
       if (cancel.ok) {
+        console.log('cancelling... set polling true')
         setIsPolling(true)
-        await mutateSubscription()
-        await mutateLicenseCount()
-        await mutateLicenses()
+      } else {
+        setDisableButton(false)
+      }
+    } catch (e) {
+      setDisableButton(false)
+      console.log(e)
+    }
+  }
+
+  const reactivateSubscription = async () => {
+    try {
+      setIsReactivatingSubscription(true)
+      setDisableButton(true)
+      const reactivate = await fetch(`/api/subscriptions/${uuid}/reactivate`, {
+        method: 'PUT',
+      })
+      if (reactivate.ok) {
+        console.log('reactivating... set polling true')
+        setIsPolling(true)
       } else {
         setDisableButton(false)
       }
@@ -165,6 +208,9 @@ const Main = ({uuid}: {uuid: string}) => {
         body: JSON.stringify({planUuid: planUuid})
       })
       if (change.ok) {
+        if (subscription?.plan.licenseType === 'metered') {
+          router.push('/settings/subscriptions')
+        }
         setIsPolling(true)
         setChangingPlanUuid(planUuid)
       } else {
@@ -205,7 +251,7 @@ const Main = ({uuid}: {uuid: string}) => {
           try {
             const countRes = await fetch(`/api/licenses/count?subscriptionUuid=${uuid}&status=active`)
             const data = await countRes.json()
-            if (data?.count === 0) {
+            if (data?.count === 0 || data?.cancelAtPeriodEnd) {
               clearInterval(licenseCountPolling)
               setIsPolling(false)
               await mutateLicenses()
@@ -218,20 +264,48 @@ const Main = ({uuid}: {uuid: string}) => {
           }
         }, 500);
       }
-      if (isChangingSubscription) {
+      if (isReactivatingSubscription) {
         const subscriptionPolling = setInterval(async () => {
           try {
-            const subRes = await fetch(`/api/subscriptions/${uuid}`)
-            const data = await subRes.json() as SalableSubscription
-            if (data?.planUuid === changingPlanUuid) {
+            const countRes = await fetch(`/api/subscriptions/${uuid}`)
+            const data = await countRes.json()
+            console.log('data.cancelAtPeriodEnd', data?.cancelAtPeriodEnd)
+            if (!data?.cancelAtPeriodEnd) {
               clearInterval(subscriptionPolling)
               setIsPolling(false)
               await mutateSubscription()
-              await mutateLicenses()
-              await mutateLicenseCount()
               setDisableButton(false)
-              setChangingPlanUuid(null)
-              setIsChangingSubscription(false)
+              setIsReactivatingSubscription(false)
+            }
+          } catch (e) {
+            console.log(e)
+          }
+        }, 500);
+      }
+      if (isChangingSubscription) {
+        const subscriptionPolling = setInterval(async () => {
+          try {
+            if (subscription?.plan.licenseType === 'metered') {
+              const subRes = await fetch(`/api/licenses?planUuid=${changingPlanUuid}`)
+              const data = await subRes.json() as GetAllLicensesResponse
+              if (data?.data.length) {
+                clearInterval(subscriptionPolling)
+                setIsPolling(false)
+                router.push('/settings/subscriptions')
+              }
+            } else {
+              const subRes = await fetch(`/api/subscriptions/${uuid}`)
+              const data = await subRes.json() as SalableSubscription
+              if (data?.planUuid === changingPlanUuid) {
+                clearInterval(subscriptionPolling)
+                setIsPolling(false)
+                await mutateSubscription()
+                await mutateLicenses()
+                await mutateLicenseCount()
+                setDisableButton(false)
+                setChangingPlanUuid(null)
+                setIsChangingSubscription(false)
+              }
             }
           } catch (e) {
             console.log(e)
@@ -239,7 +313,7 @@ const Main = ({uuid}: {uuid: string}) => {
         }, 500);
       }
     }
-  }, [salableEventUuid, isLoadingLicenseCount, isCancellingSubscription, changingPlanUuid]);
+  }, [salableEventUuid, isLoadingLicenseCount, isCancellingSubscription, changingPlanUuid, isReactivatingSubscription, isChangingSubscription]);
 
   if (!isValidating && !isLoading && !session?.uuid) {
     router.push("/")
@@ -268,8 +342,8 @@ const Main = ({uuid}: {uuid: string}) => {
                   ) : null}
                   {subscription?.status !== 'CANCELED' && usageOnLicense?.unitCount !== undefined ? (
                     <>
-                      <div className='flex justify-between items-center'>
-                        <div className='mb-6'>
+                      <div className='mb-6 flex justify-between items-center'>
+                        <div>
                           <span className='text-2xl font-bold text-gray-900 mr-4'>£{usageOnLicense?.unitCount / 100}
                             <span className='text-xs text-gray-500 font-normal'> credits spent</span>
                           </span>
@@ -277,17 +351,48 @@ const Main = ({uuid}: {uuid: string}) => {
                         </div>
                       </div>
                       <div>
-                        <div className='mt-3 flex justify-between'>
-                          <button
-                            className={`p-4 text-blue-700 rounded-md leading-none border-blue-700 border-2`}
-                            onClick={async () => {
-                              await cancelSubscription()
-                            }}
-                            disabled={disableButton}>
-                            {isCancellingSubscription ? (
-                              <div className='w-[20px]'><LoadingSpinner fill="blue"/></div>
-                            ) : "Cancel subscription"}
-                          </button>
+                        <div className='flex'>
+                          {!subscription?.cancelAtPeriodEnd ? (
+                            <>
+                              <button
+                                className={`p-4 text-white rounded-md leading-none bg-blue-700 flex items-center justify-center mr-2`}
+                                onClick={async () => {
+                                  await changeSubscription(subscription?.planUuid === salableProUsagePlanUuid ? salableBasicUsagePlanUuid : salableProUsagePlanUuid)
+                                }}
+                                disabled={disableButton}
+                              >
+                                {isChangingSubscription ? (
+                                  <div className='w-[14px] mr-2'><LoadingSpinner fill="white"/></div>
+                                ) : ''}
+                                Change to {subscription?.planUuid === salableProUsagePlanUuid ? "Basic" : "Pro"}
+                              </button>
+                              <button
+                                className={`p-4 rounded-md leading-none text-white bg-red-600 flex items-center justify-center`}
+                                onClick={async () => {
+                                  await cancelSubscription()
+                                }}
+                                disabled={disableButton}>
+                                {isCancellingSubscription ? (
+                                  <div className='w-[14px] mr-2'><LoadingSpinner fill="white"/></div>) : ''}
+                                Cancel subscription
+                              </button>
+                            </>
+                          ) : (
+                            <div className='p-3 bg-gray-200 rounded-md max-w-[400px]'>
+                              <p className='mb-2'>Your subscription is set to cancel at the end of the month. If you'd like revert this change you can reactivate your subscription below.</p>
+                              <button
+                                className={`p-4 text-white rounded-md leading-none bg-blue-700 flex items-center justify-center mr-2`}
+                                onClick={async () => {
+                                  console.log(1)
+                                  await reactivateSubscription()
+                                }}
+                              >
+                                {isReactivatingSubscription ? (
+                                  <div className='w-[14px] mr-2'><LoadingSpinner fill="white"/></div>) : ''}
+                                Reactivate
+                              </button>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </>
@@ -299,7 +404,7 @@ const Main = ({uuid}: {uuid: string}) => {
                 <>
                   {subscription?.status === 'CANCELED' ? (
                     <div className='w-[300px]'>
-                      <div className='border-b-2 flex justify-between items-end py-4 mb-3'>
+                    <div className='border-b-2 flex justify-between items-end py-4 mb-3'>
                         <div>
                           <div className='text-gray-500'>Plan</div>
                           <div className='text-xl'>{subscription?.plan?.displayName}</div>
@@ -366,7 +471,7 @@ const Main = ({uuid}: {uuid: string}) => {
                                             const res = await fetch(`/api/tokens?email=${u.email}`)
                                             const data = await res.json()
                                             if (res.ok) {
-                                              const link = `${process.env.NEXT_PUBLIC_APP_BASE_URL}/accept-invite?token=${data.value}${licenseUuid ? "&licenseUuid=" + licenseUuid : ""}`
+                                              const link = `${appBaseUrl}/accept-invite?token=${data.value}${licenseUuid ? "&licenseUuid=" + licenseUuid : ""}`
                                               await navigator.clipboard.writeText(link);
                                             }
                                           } catch (e) {
@@ -388,13 +493,13 @@ const Main = ({uuid}: {uuid: string}) => {
                           <button
                             className={`p-4 text-white rounded-md leading-none bg-blue-700 flex items-center mb-6 w-full justify-center`}
                             onClick={async () => {
-                              await changeSubscription(subscription?.planUuid === process.env.NEXT_PUBLIC_SALABLE_BASIC_PLAN_UUID ? process.env.NEXT_PUBLIC_SALABLE_PRO_PLAN_UUID as string : process.env.NEXT_PUBLIC_SALABLE_BASIC_PLAN_UUID as string)
+                              await changeSubscription(subscription?.planUuid === salableBasicPlanUuid ? salableProPlanUuid : salableBasicPlanUuid)
                             }}
                             disabled={disableButton}>
                             {isChangingSubscription ? (
                               <div className='w-[14px] mr-2'><LoadingSpinner fill="white"/></div>) : ''}
                             Change
-                            to {subscription?.planUuid === process.env.NEXT_PUBLIC_SALABLE_BASIC_PLAN_UUID ? "Pro" : "Basic"} plan
+                            to {subscription?.planUuid === salableBasicPlanUuid ? "Pro" : "Basic"} plan
                           </button>
                           <div className='flex flex-col rounded-md border-gray-300 border-2 p-4'>
                             <div className='text-xl text-center mb-2'>Update seat count</div>
@@ -490,6 +595,41 @@ const Main = ({uuid}: {uuid: string}) => {
                     </>
                   ) : null}
                 </>
+              ) : null}
+
+              {invoices && invoices.data.length > 0 ? (
+                <div className='mt-6'>
+                  <h2 className='text-2xl font-bold text-gray-900'>Invoices</h2>
+                  <div className='mt-3 rounded-md bg-white'>
+                    {invoices?.data.sort((a,b) => a.created + b.created).map((invoice, index) => {
+                      return (
+                        <div className='border-b-2 p-3 flex justify-between items-center'
+                             key={`invoice-${index}`}>
+                          <div>
+                            {invoice.effective_at ? (
+                              <span>{new Date(invoice.effective_at * 1000).toLocaleDateString()}</span>
+                            ) : null}
+                            {invoice.automatically_finalizes_at ? (
+                              <span>Invoice to finalise at {new Date(invoice.automatically_finalizes_at * 1000).toLocaleDateString()} {new Date(invoice.automatically_finalizes_at * 1000).toLocaleTimeString()}</span>
+                            ) : null}
+                          </div>
+                          <div className='flex items-center'>
+                            <span className='mr-2'>£{invoice.lines.data[0].amount * invoice.lines.data[0].price.unit_amount / 100}</span>
+                            {invoice.automatically_finalizes_at && invoice.lines.data[0].price.unit_amount ? (
+                              <>
+                                <span
+                                  className='p-1 leading-none uppercase rounded-sm bg-gray-200 text-gray-500 text-xs font-bold'>DRAFT</span>
+                              </>
+                            ) : null}
+                            {invoice.hosted_invoice_url ? (
+                              <Link className='text-blue-700' href={invoice.hosted_invoice_url}>View</Link>
+                            ) : null}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
               ) : null}
             </div>
           ) : (

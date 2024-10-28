@@ -8,6 +8,7 @@ import {Session, User} from "@/app/settings/subscriptions/[uuid]/page";
 import {DBOrganisation} from "@/app/api/organisations/[id]/route";
 import {Modal} from "@/components/modal";
 import {usePathname, useRouter, useSearchParams} from "next/navigation";
+import {appBaseUrl} from "@/app/constants";
 
 export default function Dashboard() {
   return (
@@ -66,7 +67,7 @@ const Main = () => {
                                 const res = await fetch(`/api/tokens?email=${user.email}`)
                                 const data = await res.json()
                                 if (res.ok) {
-                                  const link = `${process.env.NEXT_PUBLIC_APP_BASE_URL}/accept-invite?token=${data.value}`
+                                  const link = `${appBaseUrl}/accept-invite?token=${data.value}`
                                   await navigator.clipboard.writeText(link);
                                 }
                               } catch (e) {

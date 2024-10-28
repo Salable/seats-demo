@@ -10,6 +10,7 @@ import {Session} from "@/app/settings/subscriptions/[uuid]/page";
 import {LicenseCheckResponse} from "@/app/page";
 import { useForm, SubmitHandler } from "react-hook-form"
 import {PlanButton} from "@/components/plan-button";
+import {appBaseUrl, salableBasicUsagePlanUuid, salableUsageProductUuid} from "@/app/constants";
 
 export type Bytes = '16' | '32' | '64'
 
@@ -34,8 +35,8 @@ const Main = () => {
   const [defaultBytes, setDefaultBytes] = useState<Bytes>('16')
   const router = useRouter()
   const {data: session, isLoading: isLoadingSession, isValidating: isValidatingSession} = useSWR<Session>(`/api/session`)
-  const {data: licenseCheck, isLoading: isLoadingLicenseCheck, isValidating: isValidatingLicenseCheck} = useSWR<LicenseCheckResponse>(`/api/licenses/check?productUuid=${process.env.NEXT_PUBLIC_USAGE_PRODUCT_UUID}`)
-  const {data: usageOnLicense} = useSWR<{unitCount: number; updatedAt: string}>(`/api/usage`)
+  const {data: licenseCheck, isLoading: isLoadingLicenseCheck, isValidating: isValidatingLicenseCheck} = useSWR<LicenseCheckResponse>(`/api/licenses/check?productUuid=${salableUsageProductUuid}`)
+  const {data: usageOnLicense} = useSWR<{unitCount: number; updatedAt: string}>(`/api/usage/current?granteeId=${session?.uuid}&planUuid=${salableBasicUsagePlanUuid}`)
   const date = usageOnLicense?.updatedAt ? new Date(new Date(usageOnLicense.updatedAt)).toLocaleString([], {
     day: "numeric",
     month: "short",
@@ -46,6 +47,7 @@ const Main = () => {
   }) : ''
 
   const hasRequiredPlanSlug = licenseCheck?.capabilities?.includes("secure_strings")
+  // const hasRequiredPlanSlug = licenseCheck?.capabilities?.some((c) => ["secure_strings", "secure_strings_pro"].includes(c))
   const usage = usageOnLicense?.unitCount ?? 0
 
   const StringGenerator = () => {
@@ -155,13 +157,13 @@ const Main = () => {
                   <div>
                     {!isLoadingSession && !session?.uuid ? (
                       <Link
-                        href={"/sign-up?planUuid=" + process.env.NEXT_PUBLIC_SALABLE_USAGE_PLAN_UUID}
+                        href={`/sign-up?planUuid=${salableBasicUsagePlanUuid}&successUrl=${appBaseUrl}/usage`}
                         className='block p-4 text-white rounded-md leading-none bg-blue-700 w-full text-center'
                       >
                         Sign up
                       </Link>
                     ) : (
-                      <PlanButton uuid={process.env.NEXT_PUBLIC_SALABLE_USAGE_PLAN_UUID as string} />
+                      <PlanButton uuid={salableBasicUsagePlanUuid} successUrl={`${appBaseUrl}/usage`} />
                     )}
                   </div>
                 </div>
