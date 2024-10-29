@@ -15,7 +15,7 @@ const ZodAcceptInviteRequestBody = z.object({
   token: z.string(),
   username: z.string(),
   password: z.string(),
-  licenseUuid: z.string().uuid(),
+  licenseUuid: z.string().uuid().optional(),
 });
 
 type AcceptInviteRequestBody = z.infer<typeof ZodAcceptInviteRequestBody>

@@ -41,7 +41,7 @@ export async function GET(req: NextRequest) {
 const ZodCreateTokenRequestBody = z.object({
   organisationUuid: z.string().uuid(),
   email: z.string(),
-  licenseUuid: z.string().uuid(),
+  licenseUuid: z.string().uuid().optional(),
 });
 
 type CreateTokenRequestBody = z.infer<typeof ZodCreateTokenRequestBody>
