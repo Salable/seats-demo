@@ -4,6 +4,8 @@ import Head from "next/head";
 import {Resolver, useForm} from "react-hook-form";
 import {useRouter, useSearchParams} from "next/navigation";
 import LoadingSpinner from "@/components/loading-spinner";
+import useSWR from "swr";
+import {Session} from "@/app/settings/subscriptions/[uuid]/page";
 
 export default function AcceptInvite() {
   return (
@@ -55,6 +57,7 @@ const resolver: Resolver<FormValues> = async (values) => {
 const Main = () => {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const {mutate: mutateSession} = useSWR<Session>(`/api/session`)
   const token = searchParams.get('token')
   const licenseUuid = searchParams.get('licenseUuid')
   const { register, handleSubmit, setError, formState: { errors, isSubmitting,  } } = useForm<FormValues>({ resolver });
@@ -62,7 +65,11 @@ const Main = () => {
     try {
       const userResponse = await fetch('/api/accept-invite', {
         method: 'post',
-        body: JSON.stringify({...data, token, licenseUuid})
+        body: JSON.stringify({
+          ...data,
+          token,
+          ...(licenseUuid && {licenseUuid})
+        })
       })
       if (!userResponse.ok) {
         const data = await userResponse.json()
@@ -72,6 +79,7 @@ const Main = () => {
         })
         return
       }
+      await mutateSession()
       router.push('/')
     } catch (e) {
       console.log(e)
