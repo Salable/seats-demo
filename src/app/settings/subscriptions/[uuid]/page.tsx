@@ -363,7 +363,7 @@ const Main = ({uuid}: {uuid: string}) => {
                                         className='p-2 border-2 rounded-md text-gray-500 text-xs'
                                         onClick={async () => {
                                           try {
-                                            const res = await fetch(`/api/tokens?email=${u.email}`)
+                                            const res = await fetch(`/api/tokens?email=${encodeURIComponent(u.email)}`)
                                             const data = await res.json()
                                             if (res.ok) {
                                               const link = `${process.env.NEXT_PUBLIC_APP_BASE_URL}/accept-invite?token=${data.value}${licenseUuid ? "&licenseUuid=" + licenseUuid : ""}`

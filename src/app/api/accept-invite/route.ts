@@ -14,7 +14,6 @@ export const revalidate = 0
 const ZodAcceptInviteRequestBody = z.object({
   token: z.string(),
   username: z.string(),
-  email: z.string(),
   password: z.string(),
   licenseUuid: z.string().uuid(),
 });
@@ -39,7 +38,6 @@ export async function POST(req: NextRequest) {
     const updateUser = await db.update(usersTable)
       .set({
         username: data.username,
-        email: data.email,
         salt,
         hash
       })

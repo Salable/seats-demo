@@ -73,7 +73,8 @@ export async function POST(req: NextRequest) {
     }).returning();
 
     const token = randomBytes(32).toString('hex')
-    const tokenDB = await db.insert(tokensTable).values({
+
+    await db.insert(tokensTable).values({
       uuid: randomUUID(),
       value: token,
       organisationUuid: existingOrganisationsResult[0].uuid,
