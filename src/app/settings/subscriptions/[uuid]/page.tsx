@@ -180,7 +180,7 @@ const Main = ({uuid}: {uuid: string}) => {
     if (!isLoadingLicenseCount && licenseCount?.count && !isPolling) {
       setUpdatedLicenseCount(licenseCount.count)
     }
-  }, [isLoadingLicenseCount]);
+  }, [isLoadingLicenseCount, isValidatingLicenseCount]);
 
   useEffect(() => {
     if (isPolling) {
