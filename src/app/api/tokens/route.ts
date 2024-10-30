@@ -12,11 +12,17 @@ export async function GET(req: NextRequest) {
   try {
     const email = req.nextUrl.searchParams.get('email')
 
+    if (!email) {
+      return NextResponse.json({error: 'email parameter is required'},
+        { status: 400 }
+      );
+    }
+
     const existingUsersResult = await db.select()
       .from(usersTable)
-      .where(eq(usersTable.email, email as string))
-    if (existingUsersResult.length === 0) return NextResponse.json({status: 404});
+      .where(eq(usersTable.email, email))
 
+    if (existingUsersResult.length === 0) return NextResponse.json({status: 404});
     const user = existingUsersResult[0]
 
     const existingTokensResult = await db.select()
