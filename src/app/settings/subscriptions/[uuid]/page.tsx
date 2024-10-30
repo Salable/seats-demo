@@ -60,13 +60,14 @@ const Main = ({uuid}: {uuid: string}) => {
   const [disableButton, setDisableButton] = useState(false)
   const [updatedLicenseCount, setUpdatedLicenseCount] = useState<number | null>(null)
   const [isCancellingSubscription, setIsCancellingSubscription] = useState<boolean>(false)
+  const [pollLicenseCount, setPollLicenseCount] = useState<boolean>(false)
   const [isChangingSubscription, setIsChangingSubscription] = useState<boolean>(false)
   const [isChangingSeatCount, setIsChangingSeatCount] = useState<boolean>(false)
   const [changingPlanUuid, setChangingPlanUuid] = useState<string | null>(null)
 
   const {data: session, isLoading, isValidating} = useSWR<Session>(`/api/session`)
   const {data: users} = useSWR<User[]>(`/api/organisations/${session?.organisationUuid}/users`)
-  const {data: subscription, mutate: mutateSubscription } = useSWR<SalableSubscription>(`/api/subscriptions/${uuid}`)
+  const {data: subscription, mutate: mutateSubscription, isValidating: isValidatingSubscription, isLoading: isLoadingSubscription } = useSWR<SalableSubscription>(`/api/subscriptions/${uuid}`)
   const {data: licenses, mutate: mutateLicenses, isLoading: isLoadingLicenses, isValidating: isValidatingLicenses} = useSWR<GetAllLicensesResponse>(`/api/licenses?subscriptionUuid=${uuid}${subscription?.status !== 'CANCELED' ? "&status=active" : ""}`)
   const {data: licenseCount, mutate: mutateLicenseCount, isLoading: isLoadingLicenseCount,  isValidating: isValidatingLicenseCount} = useSWR<GetLicensesCountResponse>(`/api/licenses/count?subscriptionUuid=${uuid}&status=active`)
   const {data: usageOnLicense} = useSWR<{unitCount: number; updatedAt: string}>(`/api/usage`)
@@ -144,9 +145,7 @@ const Main = ({uuid}: {uuid: string}) => {
       })
       if (cancel.ok) {
         setIsPolling(true)
-        await mutateSubscription()
-        await mutateLicenseCount()
-        await mutateLicenses()
+        setPollLicenseCount(true)
       } else {
         setDisableButton(false)
       }
@@ -200,7 +199,7 @@ const Main = ({uuid}: {uuid: string}) => {
           }
         }, 500);
       }
-      if (isCancellingSubscription) {
+      if (pollLicenseCount) {
         const licenseCountPolling = setInterval(async () => {
           try {
             const countRes = await fetch(`/api/licenses/count?subscriptionUuid=${uuid}&status=active`)
@@ -210,8 +209,10 @@ const Main = ({uuid}: {uuid: string}) => {
               setIsPolling(false)
               await mutateLicenses()
               await mutateLicenseCount()
+              await mutateSubscription()
               setDisableButton(false)
               setIsCancellingSubscription(false)
+              setPollLicenseCount(false)
             }
           } catch (e) {
             console.log(e)
@@ -239,7 +240,7 @@ const Main = ({uuid}: {uuid: string}) => {
         }, 500);
       }
     }
-  }, [salableEventUuid, isLoadingLicenseCount, isCancellingSubscription, changingPlanUuid]);
+  }, [salableEventUuid, isLoadingLicenseCount, pollLicenseCount, changingPlanUuid]);
 
   if (!isValidating && !isLoading && !session?.uuid) {
     router.push("/")
@@ -252,7 +253,7 @@ const Main = ({uuid}: {uuid: string}) => {
             {subscription?.status === 'ACTIVE' ? <span className='px-2 ml-2 py-2 rounded-md leading-none bg-sky-200 text-sky-500 uppercase text-lg font-bold'>{subscription.plan.displayName}</span> : null}
             {subscription?.status === 'CANCELED' ? <span className='px-2 ml-2 py-2 rounded-md leading-none bg-red-200 text-red-500 uppercase text-lg font-bold'>{subscription.status}</span> : null}
           </h1>
-          {!isValidatingLicenseCount && !isLoadingLicenseCount && !isLoadingLicenses && !isValidatingLicenses ? (
+          {!isValidatingLicenseCount && !isLoadingLicenseCount && !isLoadingLicenses && !isValidatingLicenses && !isValidatingSubscription && !isLoadingSubscription ? (
             <div>
               {subscription?.plan.licenseType === 'metered' ? (
                 <>
