@@ -18,35 +18,12 @@ export async function GET(req: NextRequest) {
       );
     }
 
-
-    // const res = await db.select()
-    //   .from(users)
-    //   .leftJoin(posts, eq(posts.authorId, users.id))
-    //   .orderBy(users.id)
     const existingUsersResult = await db.select()
       .from(usersTable)
       .where(eq(usersTable.email, email))
 
     if (existingUsersResult.length === 0) return NextResponse.json({status: 404});
     const user = existingUsersResult[0]
-
-    // const users = await db.select()
-    //   .from(usersOrganisationsTable)
-    //   .rightJoin(usersTable, eq(usersOrganisationsTable.userUuid, usersTable.uuid))
-    //   .where(eq(usersOrganisationsTable.organisationUuid, params.id))
-
-    const organisationResult = await db.select()
-      .from(usersOrganisationsTable)
-      .leftJoin(organisationsTable, eq(organisationsTable.uuid, usersOrganisationsTable.organisationUuid))
-      .where(eq(usersOrganisationsTable.userUuid, user.uuid))
-
-    if (organisationResult.length === 0) return NextResponse.json({status: 404});
-    const organisation = organisationResult[0].Organisations
-
-
-    console.log('organisation', organisation)
-
-    console.log(user)
 
     const existingTokensResult = await db.select()
       .from(tokensTable)
@@ -55,7 +32,7 @@ export async function GET(req: NextRequest) {
 
     const token = existingTokensResult[0]
 
-    return NextResponse.json({value: token.value, organisation},
+    return NextResponse.json({value: token.value},
       { status: 200 }
     );
   } catch (e) {
