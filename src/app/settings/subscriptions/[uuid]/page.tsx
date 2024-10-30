@@ -299,8 +299,8 @@ const Main = ({uuid}: {uuid: string}) => {
               {subscription?.plan.licenseType === 'perSeat' ? (
                 <>
                   {subscription?.status === 'CANCELED' ? (
-                    <div className='w-[300px]'>
-                      <div className='border-b-2 flex justify-between items-end py-4 mb-3'>
+                    <div className='w-[300px] bg-white p-4 rounded-md shadow'>
+                      <div className='border-b-2 flex justify-between items-end pb-3'>
                         <div>
                           <div className='text-gray-500'>Plan</div>
                           <div className='text-xl'>{subscription?.plan?.displayName}</div>
@@ -311,8 +311,10 @@ const Main = ({uuid}: {uuid: string}) => {
                           </div>
                         </div>
                       </div>
-                      <Price price={subscription.plan.currencies?.[0].price} count={Number(subscription.quantity)}
-                             interval={subscription.plan.interval} label="Total"/>
+                      <div className='mt-3'>
+                        <Price price={subscription.plan.currencies?.[0].price} count={Number(subscription.quantity)}
+                               interval={subscription.plan.interval} label="Total"/>
+                      </div>
                     </div>
                   ) : null}
                   {subscription?.status !== 'CANCELED' ? (
