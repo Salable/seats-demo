@@ -65,7 +65,7 @@ const Main = () => {
                               try {
                                 const params = new URLSearchParams();
                                 params.set('email', user.email);
-                                const res = await fetch(`/api/tokens?${params}`, {})
+                                const res = await fetch(`/api/tokens?${params}`)
                                 const data = await res.json()
                                 if (res.ok) {
                                   const link = `${process.env.NEXT_PUBLIC_APP_BASE_URL}/accept-invite?token=${data.value}`
