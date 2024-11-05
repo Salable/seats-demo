@@ -8,9 +8,11 @@ import {useOnClickOutside} from "usehooks-ts";
 import {useRouter} from "next/navigation";
 import Link from "next/link";
 import useSWR from "swr";
-import {Session} from "@/app/settings/subscriptions/[uuid]/page";
+import {Session, User} from "@/app/settings/subscriptions/[uuid]/page";
 import {CrossIcon} from "@/components/icons/cross-icon";
 import {PlanButton} from "@/components/plan-button";
+import {salableBasicPlanUuid, salableProductUuid, salableProPlanUuid} from "@/app/constants";
+import {GetAllSubscriptionsResponse, SalableSubscription} from "@/app/api/subscriptions/route";
 
 export type LicenseCheckResponse = {
   capabilities: string[],
@@ -37,13 +39,18 @@ export default function Home() {
 
 const Main = () => {
   const {data: session, isLoading: isLoadingSession, isValidating: isValidatingSession} = useSWR<Session>(`/api/session`)
-  const {data: licenseCheck, isLoading: isLoadingLicenseCheck, isValidating: isValidatingLicenseCheck} = useSWR<LicenseCheckResponse>(`/api/licenses/check?productUuid=${process.env.NEXT_PUBLIC_PRODUCT_UUID}`)
+  const {data: licenseCheck, isLoading: isLoadingLicenseCheck, isValidating: isValidatingLicenseCheck} = useSWR<LicenseCheckResponse>(`/api/licenses/check?productUuid=${salableProductUuid}`)
+  const {data: owner} = useSWR<User[]>(`/api/organisations/${session?.organisationUuid}/owner`)
+  const {data: subscriptions, isLoading: isLoadingSubscriptions, isValidating: isValidatingSubscriptions} = useSWR<GetAllSubscriptionsResponse>(`/api/subscriptions?status=active`)
+
+  const isOwner = session?.uuid === owner
+
   return (
     <>
       <div className='max-w-[1000px] m-auto'>
-        {(!isLoadingSession && !isLoadingLicenseCheck) && (!isValidatingSession && !isValidatingLicenseCheck) ? (
+        {(!isLoadingSession && !isValidatingSession) && (!isLoadingLicenseCheck && !isValidatingLicenseCheck) && (!isLoadingSubscriptions && !isValidatingSubscriptions) ? (
           <>
-            {!licenseCheck?.capabilitiesEndDates ? (
+            {(!licenseCheck?.capabilitiesEndDates && isOwner && subscriptions?.data.length === 0) || !session?.uuid ? (
               <div className='grid grid-cols-3 gap-6'>
 
                 <div className='p-6 rounded-lg bg-white shadow flex-col'>
@@ -77,13 +84,13 @@ const Main = () => {
                   <div>
                     {!isLoadingSession && !session?.uuid ? (
                       <Link
-                        href={"/sign-up?planUuid=" + process.env.NEXT_PUBLIC_SALABLE_BASIC_PLAN_UUID}
+                        href={"/sign-up?planUuid=" + salableBasicPlanUuid}
                         className='block p-4 text-white rounded-md leading-none bg-blue-700 w-full text-center'
                       >
                         Sign up
                       </Link>
                     ) : (
-                      <PlanButton uuid={process.env.NEXT_PUBLIC_SALABLE_BASIC_PLAN_UUID as string} />
+                      <PlanButton uuid={salableBasicPlanUuid} />
                     )}
                   </div>
                 </div>
@@ -120,20 +127,21 @@ const Main = () => {
                   <div>
                     {!isLoadingSession && !session?.uuid ? (
                       <Link
-                        href={"/sign-up?planUuid=" + process.env.NEXT_PUBLIC_SALABLE_PLAN_UUID}
+                        href={`/sign-up?planUuid=${salableProPlanUuid}`}
                         className='block p-4 text-white rounded-md leading-none bg-blue-700 w-full text-center'
                       >
                         Sign up
                       </Link>
                     ) : (
-                      <PlanButton uuid={process.env.NEXT_PUBLIC_SALABLE_PRO_PLAN_UUID as string} />
+                      <PlanButton uuid={salableProPlanUuid} />
                     )}
                   </div>
                 </div>
 
               </div>
             ) : null}
-            {licenseCheck?.capabilitiesEndDates ? (
+
+            {!isOwner && session?.uuid || isOwner && subscriptions?.data.length ? (
               <div className='mt-6'>
                 <div className='mb-6 flex items-center flex-shrink-0'>
                   <h2 className='text-2xl font-bold text-gray-900 mr-4'>
@@ -176,5 +184,25 @@ const Main = () => {
         )}
       </div>
     </>
+  )
+}
+
+const LoadingSkeleton = () => {
+  return (
+    <div className="shadow rounded-sm p-4 w-full bg-white mx-auto mb-2">
+      <div className="animate-pulse flex w-full">
+        <div className="flex-1 space-y-6 py-1">
+          <div className="flex justify-between">
+            <div className='flex'>
+              <div className="mr-2 h-2 bg-slate-300 rounded w-[100px]"></div>
+            </div>
+            <div className='flex'>
+              <div className="mr-2 h-2 bg-slate-300 rounded w-[100px]"></div>
+              <div className="h-2 bg-slate-300 rounded w-[50px]"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   )
 }

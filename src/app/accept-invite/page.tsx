@@ -4,6 +4,9 @@ import Head from "next/head";
 import {Resolver, useForm} from "react-hook-form";
 import {useRouter, useSearchParams} from "next/navigation";
 import LoadingSpinner from "@/components/loading-spinner";
+import useSWR from "swr";
+import {Session} from "@/app/settings/subscriptions/[uuid]/page";
+import {DBOrganisation} from "@/app/api/organisations/[id]/route";
 
 export default function AcceptInvite() {
   return (
@@ -57,12 +60,18 @@ const Main = () => {
   const searchParams = useSearchParams()
   const token = searchParams.get('token')
   const licenseUuid = searchParams.get('licenseUuid')
+  const {mutate: mutateSession} = useSWR<Session>(`/api/session`)
+  const {data: tokenOrganisationData, isLoading: isLoadingTokenOrganisation} = useSWR<DBOrganisation>(`/api/tokens/${token}/organisation`)
   const { register, handleSubmit, setError, formState: { errors, isSubmitting,  } } = useForm<FormValues>({ resolver });
   const onSubmit = handleSubmit(async (data) => {
     try {
       const userResponse = await fetch('/api/accept-invite', {
         method: 'post',
-        body: JSON.stringify({...data, token, licenseUuid})
+        body: JSON.stringify({
+          ...data,
+          token,
+          ...(licenseUuid && {licenseUuid})
+        })
       })
       if (!userResponse.ok) {
         const data = await userResponse.json()
@@ -72,6 +81,7 @@ const Main = () => {
         })
         return
       }
+      await mutateSession()
       router.push('/')
     } catch (e) {
       console.log(e)
@@ -80,31 +90,39 @@ const Main = () => {
   return (
     <>
       <div className='max-w-[500px] m-auto'>
-        <h1 className='text-3xl mb-4'>Sign up</h1>
-        <form onSubmit={onSubmit} className='grid gap-3'>
-          <fieldset>
-            <input className='p-3 w-full' {...register("username")} placeholder="Username"/>
-            {errors.username && <p className='text-red-600'>{errors.username.message}</p>}
-          </fieldset>
+        {!isLoadingTokenOrganisation ? (
+          <>
+            <h1 className='text-3xl mb-4'>Join {tokenOrganisationData?.name}</h1>
+            <form onSubmit={onSubmit} className='grid gap-3'>
+              <fieldset>
+                <input className='p-3 w-full' {...register("username")} placeholder="Username"/>
+                {errors.username && <p className='text-red-600'>{errors.username.message}</p>}
+              </fieldset>
 
-          <fieldset>
-            <input type="password" className='p-3 w-full' {...register("password")} placeholder="Password"/>
-            {errors.password && <p className='text-red-600'>{errors.password.message}</p>}
-          </fieldset>
+              <fieldset>
+                <input type="password" className='p-3 w-full' {...register("password")} placeholder="Password"/>
+                {errors.password && <p className='text-red-600'>{errors.password.message}</p>}
+              </fieldset>
 
-          <div>
-            <button
-              className={`p-4 text-white rounded-md leading-none bg-blue-700`}
-            >
-              {!isSubmitting ? "Sign up" : <div className='w-[15px]'><LoadingSpinner fill="white"/></div>}
-            </button>
+              <div>
+                <button
+                  className={`p-4 text-white rounded-md leading-none bg-blue-700`}
+                >
+                  {!isSubmitting ? "Sign up" : <div className='w-[15px]'><LoadingSpinner fill="white"/></div>}
+                </button>
+              </div>
+              {errors.root?.serverError ? (
+                <div className='bg-red-500 text-white p-2 rounded-sm'>
+                  {errors.root?.serverError.message}
+                </div>
+              ) : null}
+            </form>
+          </>
+        ) : (
+          <div className="w-[20px]">
+            <LoadingSpinner/>
           </div>
-          {errors.root?.serverError ? (
-            <div className='bg-red-500 text-white p-2 rounded-sm'>
-              {errors.root?.serverError.message}
-            </div>
-          ) : null}
-        </form>
+        )}
       </div>
     </>
   )

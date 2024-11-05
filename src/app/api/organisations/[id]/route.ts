@@ -4,7 +4,7 @@ import {organisationsTable} from "@/drizzle/schema";
 import {eq} from "drizzle-orm";
 
 export type DBOrganisation = {
-  ID: number;
+  uuid: number;
   name: string;
 }
 

@@ -23,6 +23,7 @@ export const Modal = () => {
   const subscriptionUuid = searchParams.get("subscriptionUuid")
   const { register, setError, handleSubmit, formState: { errors, isSubmitting, isSubmitSuccessful } } = useForm<ModalFormValues>();
   const ref = useRef(null)
+
   const removeQueryParams = () => {
     const params = new URLSearchParams(searchParams.toString())
     params.delete("modalOpen")
@@ -47,7 +48,7 @@ export const Modal = () => {
         body: JSON.stringify({
           organisationUuid: session?.organisationUuid,
           email: values.email,
-          licenseUuid
+          ...(licenseUuid && {licenseUuid})
         })
       })
       const data = await res.json()
