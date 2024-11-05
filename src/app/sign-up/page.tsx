@@ -58,7 +58,7 @@ const Main = () => {
           customerEmail: user.email,
           granteeId: user.uuid,
           member: user.organisationUuid,
-          successUrl: successUrl ?? appBaseUrl,
+          successUrl: successUrl ?? appBaseUrl as string,
           cancelUrl: `${appBaseUrl}/cancel`,
         })
         const urlFetch = await fetch(`${salableApiBaseUrl}/plans/${planUuid}/checkoutlink?${params.toString()}`, {

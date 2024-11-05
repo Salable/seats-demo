@@ -5,7 +5,7 @@ import {useRouter} from "next/navigation";
 import LoadingSpinner from "@/components/loading-spinner";
 import {appBaseUrl, salableApiBaseUrl, salableApiKeyPlansRead} from "@/app/constants";
 
-export const PlanButton = ({uuid, successUrl = appBaseUrl}: {uuid: string, successUrl?: string}) => {
+export const PlanButton = ({uuid, successUrl = appBaseUrl as string}: {uuid: string, successUrl?: string}) => {
   const {data: session, isLoading: isLoadingSession, isValidating: isValidatingSession} = useSWR<Session>(`/api/session`)
   const [isFetchingUrl, setIsFetchingUrl] = useState(false)
   const router = useRouter()
@@ -21,7 +21,7 @@ export const PlanButton = ({uuid, successUrl = appBaseUrl}: {uuid: string, succe
               granteeId: session.uuid,
               member: session.email,
               successUrl,
-              cancelUrl: appBaseUrl,
+              cancelUrl: appBaseUrl as string,
             })
             const urlFetch = await fetch(`${salableApiBaseUrl}/plans/${uuid}/checkoutlink?${params.toString()}`, {
               headers: {'x-api-key': salableApiKeyPlansRead}
