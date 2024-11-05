@@ -57,7 +57,7 @@ const Main = () => {
                         <p className='mr-2'>{user.username} <span
                           className='text-gray-500 italic text-sm'>({user.email})</span></p>
                         {user.uuid === session?.uuid ? <div
-                          className='p-2 border-2 rounded-md text-gray-500 bg-gray-200 text-xs leading-none'>You</div> : null}
+                          className='p-1 border-2 rounded-md text-gray-500 bg-gray-200 text-xs leading-none font-bold'>You</div> : null}
                         {user.username && session && user.uuid !== session.uuid && isOwner ? (
                           <DeleteUser userUuid={user.uuid}/>
                         ) : null}
@@ -129,7 +129,7 @@ const DeleteUser = ({userUuid}: { userUuid: string }) => {
   return (
     <>
       <button
-        className='text-red-600 p-2 border-2 rounded-md border-red-600 text-xs'
+        className='text-red-600 p-1 border-2 rounded-md border-red-600 text-xs font-bold'
         onClick={async () => {
           try {
             setIsDeletingUser(true)
@@ -155,7 +155,7 @@ const LoadingSkeleton = () => {
     <div>
       <div className="mb-4 h-2 bg-slate-300 rounded w-[100px]"></div>
 
-      <div className="shadow rounded-sm p-4 w-full bg-white mx-auto mb-2">
+      <div className="shadow rounded-sm p-4 w-full bg-white mx-auto border-b-2">
         <div className="animate-pulse flex w-full">
           <div>
             <div className="flex justify-between">
@@ -167,7 +167,7 @@ const LoadingSkeleton = () => {
           </div>
         </div>
       </div>
-      <div className="shadow rounded-sm p-4 w-full bg-white mx-auto mb-2">
+      <div className="shadow rounded-sm p-4 w-full bg-white mx-auto border-b-2">
         <div className="animate-pulse flex w-full">
           <div>
             <div className="flex justify-between">
@@ -179,7 +179,7 @@ const LoadingSkeleton = () => {
           </div>
         </div>
       </div>
-      <div className="shadow rounded-sm p-4 w-full bg-white mx-auto mb-2">
+      <div className="shadow rounded-sm p-4 w-full bg-white mx-auto border-b-2">
         <div className="animate-pulse flex w-full">
           <div>
             <div className="flex justify-between">
@@ -191,7 +191,7 @@ const LoadingSkeleton = () => {
           </div>
         </div>
       </div>
-      <div className="shadow rounded-sm p-4 w-full bg-white mx-auto mb-2">
+      <div className="shadow rounded-sm p-4 w-full bg-white mx-auto border-b-2">
         <div className="animate-pulse flex w-full">
           <div>
             <div className="flex justify-between">
@@ -204,7 +204,7 @@ const LoadingSkeleton = () => {
         </div>
       </div>
 
-      <div className='flex justify-end'>
+      <div className='flex justify-end mt-4'>
         <div className='w-[98px] h-[46px] rounded-md bg-slate-300 animate-pulse'></div>
       </div>
     </div>

@@ -1,3 +1,7 @@
+import { config } from 'dotenv';
+
+config({ path: '.env' });
+
 if(!process.env.NEXT_PUBLIC_SALABLE_API_BASE_URL) throw new Error('Missing env NEXT_PUBLIC_SALABLE_API_BASE_URL')
 if(!process.env.NEXT_PUBLIC_SALABLE_API_KEY_PLANS_READ) throw new Error('Missing env NEXT_PUBLIC_SALABLE_API_KEY_PLANS_READ')
 if(!process.env.NEXT_PUBLIC_SALABLE_BASIC_PLAN_UUID) throw new Error('Missing env NEXT_PUBLIC_SALABLE_BASIC_PLAN_UUID')
