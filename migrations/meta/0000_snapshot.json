@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "ebedb5aa-172f-416e-8666-daf1c47491fc",
+  "id": "7f985f6d-5e49-4683-8fb3-2f73676d7d63",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "Organisations": {
@@ -16,6 +16,13 @@
         },
         "name": {
           "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "owner": {
+          "name": "owner",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -38,7 +45,21 @@
           "isUnique": true
         }
       },
-      "foreignKeys": {},
+      "foreignKeys": {
+        "Organisations_owner_Users_uuid_fk": {
+          "name": "Organisations_owner_Users_uuid_fk",
+          "tableFrom": "Organisations",
+          "tableTo": "Users",
+          "columnsFrom": [
+            "owner"
+          ],
+          "columnsTo": [
+            "uuid"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },

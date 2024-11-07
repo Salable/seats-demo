@@ -11,6 +11,9 @@ export const usersTable = sqliteTable('Users', {
 export const organisationsTable = sqliteTable('Organisations', {
   uuid: text('uuid').unique().primaryKey(),
   name: text('name').unique().notNull(),
+  owner: text('owner')
+    .notNull()
+    .references(() => usersTable.uuid, {onDelete: "cascade"}),
 });
 
 export const tokensTable = sqliteTable('Tokens', {

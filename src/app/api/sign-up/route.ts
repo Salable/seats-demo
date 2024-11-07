@@ -37,11 +37,6 @@ export async function POST(req: NextRequest) {
     const salt = randomBytes(16).toString('hex');
     const hash = hashString(data.password, salt)
 
-    const createOrg = await db.insert(organisationsTable).values({
-      uuid: randomUUID(),
-      name: data.organisationName}).returning();
-    const organisation = createOrg[0]
-
     const createUser = await db.insert(usersTable).values({
       uuid: randomUUID(),
       username: data.username,
@@ -50,6 +45,13 @@ export async function POST(req: NextRequest) {
       hash
     }).returning();
     const user = createUser[0]
+
+    const createOrg = await db.insert(organisationsTable).values({
+      uuid: randomUUID(),
+      name: data.organisationName,
+      owner: user.uuid
+    }).returning();
+    const organisation = createOrg[0]
 
     await db.insert(usersOrganisationsTable).values({userUuid: user.uuid, organisationUuid: organisation.uuid});
 

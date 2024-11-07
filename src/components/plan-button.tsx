@@ -3,8 +3,9 @@ import {Session} from "@/app/settings/subscriptions/[uuid]/page";
 import React, {useState} from "react";
 import {useRouter} from "next/navigation";
 import LoadingSpinner from "@/components/loading-spinner";
+import {appBaseUrl, salableApiBaseUrl, salableApiKeyPlansRead} from "@/app/constants";
 
-export const PlanButton = ({uuid}: {uuid: string}) => {
+export const PlanButton = ({uuid, successUrl = appBaseUrl as string}: {uuid: string, successUrl?: string}) => {
   const {data: session, isLoading: isLoadingSession, isValidating: isValidatingSession} = useSWR<Session>(`/api/session`)
   const [isFetchingUrl, setIsFetchingUrl] = useState(false)
   const router = useRouter()
@@ -19,11 +20,11 @@ export const PlanButton = ({uuid}: {uuid: string}) => {
               customerEmail: session.email,
               granteeId: session.uuid,
               member: session.email,
-              successUrl: process.env.NEXT_PUBLIC_APP_BASE_URL as string,
-              cancelUrl: `${process.env.NEXT_PUBLIC_APP_BASE_URL}/cancel`,
+              successUrl,
+              cancelUrl: appBaseUrl as string,
             })
-            const urlFetch = await fetch(`${process.env.NEXT_PUBLIC_SALABLE_API_BASE_URL}/plans/${uuid}/checkoutlink?${params.toString()}`, {
-              headers: {'x-api-key': process.env.NEXT_PUBLIC_SALABLE_API_KEY_PLANS_READ as string}
+            const urlFetch = await fetch(`${salableApiBaseUrl}/plans/${uuid}/checkoutlink?${params.toString()}`, {
+              headers: {'x-api-key': salableApiKeyPlansRead}
             })
             const data = await urlFetch.json()
             router.push(data.checkoutUrl)

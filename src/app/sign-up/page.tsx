@@ -7,6 +7,7 @@ import Link from "next/link";
 import LoadingSpinner from "@/components/loading-spinner";
 import useSWR from "swr";
 import {Session} from "@/app/settings/subscriptions/[uuid]/page";
+import {appBaseUrl, salableApiBaseUrl, salableApiKeyPlansRead} from "@/app/constants";
 
 export default function SignUp() {
   return (
@@ -34,6 +35,7 @@ const Main = () => {
   const router = useRouter()
   const searchParams = useSearchParams()
   const planUuid = searchParams.get('planUuid')
+  const successUrl = searchParams.get('successUrl')
   const {data: session, isLoading: isLoadingSession, isValidating: isValidatingSession} = useSWR<Session>(`/api/session`)
   const { register, setError, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormValues>();
   const onSubmit = handleSubmit(async (data) => {
@@ -56,16 +58,17 @@ const Main = () => {
           customerEmail: user.email,
           granteeId: user.uuid,
           member: user.organisationUuid,
-          successUrl: process.env.NEXT_PUBLIC_APP_BASE_URL as string,
-          cancelUrl: `${process.env.NEXT_PUBLIC_APP_BASE_URL}/cancel`,
+          successUrl: successUrl ?? appBaseUrl as string,
+          cancelUrl: `${appBaseUrl}/cancel`,
         })
-        const urlFetch = await fetch(`${process.env.NEXT_PUBLIC_SALABLE_API_BASE_URL}/plans/${planUuid}/checkoutlink?${params.toString()}`, {
-          headers: {'x-api-key': process.env.NEXT_PUBLIC_SALABLE_API_KEY_PLANS_READ as string}
+        const urlFetch = await fetch(`${salableApiBaseUrl}/plans/${planUuid}/checkoutlink?${params.toString()}`, {
+          headers: {'x-api-key': salableApiKeyPlansRead}
         })
         const data = await urlFetch.json()
         router.push(data.checkoutUrl)
+      } else {
+        router.push('/')
       }
-      router.push('/')
     } catch (e) {
       console.log(e)
     }

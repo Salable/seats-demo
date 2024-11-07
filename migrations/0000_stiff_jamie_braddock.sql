@@ -1,6 +1,8 @@
 CREATE TABLE `Organisations` (
 	`uuid` text PRIMARY KEY NOT NULL,
-	`name` text NOT NULL
+	`name` text NOT NULL,
+	`owner` text NOT NULL,
+	FOREIGN KEY (`owner`) REFERENCES `Users`(`uuid`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
 CREATE TABLE `Tokens` (
