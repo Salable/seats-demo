@@ -1,6 +1,5 @@
 'use client'
 import React from "react";
-import LoadingSpinner from "@/components/loading-spinner";
 import "react-toastify/dist/ReactToastify.css";
 import Link from "next/link";
 import Head from "next/head";
@@ -56,15 +55,12 @@ const Main = () => {
                 </div>
               </div>
             ))
-          ) : null}
+          ) : (
+            <p className='mb-3'>No subscriptions found. Subscribe to one of our plans to <Link href='/' className={'text-blue-500'}>get started!</Link></p>
+          )}
         </div>
       ) : (
-        <div className="w-full">
-          <LoadingSkeleton />
-          <LoadingSkeleton />
-          <LoadingSkeleton />
-          <LoadingSkeleton />
-        </div>
+        <LoadingSkeleton/>
       )}
     </div>
   )
@@ -72,20 +68,24 @@ const Main = () => {
 
 const LoadingSkeleton = () => {
   return (
-    <div className="shadow rounded-sm p-4 w-full bg-white mx-auto mb-2">
-      <div className="animate-pulse flex w-full">
-        <div className="flex-1 space-y-6 py-1">
-          <div className="flex justify-between">
-            <div className='flex'>
-              <div className="mr-2 h-2 bg-slate-300 rounded w-[100px]"></div>
-            </div>
-            <div className='flex'>
-              <div className="mr-2 h-2 bg-slate-300 rounded w-[100px]"></div>
-              <div className="h-2 bg-slate-300 rounded w-[50px]"></div>
+    <div>
+      {[...new Array(4)].map(() => (
+        <div className="shadow rounded-sm p-4 w-full bg-white mx-auto mb-2">
+          <div className="animate-pulse flex w-full">
+            <div className="flex-1 space-y-6 py-1">
+              <div className="flex justify-between">
+                <div className='flex'>
+                  <div className="mr-2 h-2 bg-slate-300 rounded w-[100px]"></div>
+                </div>
+                <div className='flex'>
+                  <div className="mr-2 h-2 bg-slate-300 rounded w-[100px]"></div>
+                  <div className="h-2 bg-slate-300 rounded w-[50px]"></div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      ))}
     </div>
   )
 }

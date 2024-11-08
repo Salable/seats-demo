@@ -25,9 +25,6 @@ export const Header = () => {
   }
   useOnClickOutside(ref, clickOutside)
 
-  // no subscriptions handled in /settings/subscriptions
-  // org loading state not good
-
   return (
     <header className='bg-white'>
       <div className='max-w-[1000px] m-auto py-4 flex justify-between items-center'>
@@ -36,9 +33,6 @@ export const Header = () => {
           <span>Salable Seats Demo</span>
         </Link>
         <div className='flex items-center'>
-          {/*<div className='w-[12px]'>*/}
-          {/*  <LoadingSpinner />*/}
-          {/*</div>*/}
           <div className="flex justify-between items-center">
             {session?.uuid ? (
               <div ref={ref} className={`relative hover:bg-white ${dropDownOpen && "bg-white rounded-br-none"}`}>
@@ -60,11 +54,11 @@ export const Header = () => {
                           method: 'DELETE'
                         })
                         await mutateSession()
+                        router.push('/sign-in')
                         await mutateLicenseCheck()
                         await mutateUsers()
                         setLoggingOut(false)
                         setDropDownOpen(false)
-                        router.push('/')
                       } catch (e) {
                         console.log(e)
                       }

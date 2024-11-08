@@ -643,26 +643,60 @@ const Price = ({price, count, interval, label}: { price: number, count: number, 
   )
 }
 
-// const LoadingSkeleton = () => {
-//   return (
-//     <div className='grid grid-cols-[2fr_1fr] gap-6'>
-//       <div className="shadow rounded-sm p-4 w-full bg-white mx-auto mb-2">
-//         <div className="animate-pulse flex w-full">
-//           <div className="flex-1 space-y-6 py-1">
-//             <div className="flex justify-between">
-//               <div className='flex'>
-//                 <div className="mr-2 h-2 bg-slate-300 rounded w-[100px]"></div>
-//               </div>
-//               <div className='flex'>
-//                 <div className="mr-2 h-2 bg-slate-300 rounded w-[100px]"></div>
-//                 <div className="h-2 bg-slate-300 rounded w-[50px]"></div>
-//               </div>
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-//
-//       <div></div>
-//     </div>
-//   )
-// }
+const LoadingSkeleton = () => {
+  return (
+    <div>
+      <div>
+        <div className="animate-pulse flex items-center">
+          <div className="mr-2 h-2 bg-slate-300 rounded w-[162px]"></div>
+          <div className="mr-2 h-[34px] w-[95px] bg-slate-300 rounded-md"></div>
+        </div>
+      </div>
+
+      <div className='mt-6 animate-pulse'>
+        <div className="h-2 mb-2 bg-slate-300 rounded w-[75px]"></div>
+        <div className="h-2 bg-slate-300 rounded w-[200px]"></div>
+        <div className='flex items-center mt-6'>
+          <div className="mr-2 h-[46px] w-[100px] bg-slate-300 rounded-md"></div>
+          <div className="mr-2 h-[46px] w-[160px] bg-slate-300 rounded-md"></div>
+        </div>
+      </div>
+
+      <div className='mt-6'>
+        <div className="mb-4 h-2 bg-slate-300 rounded w-[100px]"></div>
+
+        {[...new Array(2)].map((_, index) => (
+          <div className="shadow rounded-sm p-4 w-full bg-white mx-auto border-b-2" key={`loading-${index}`}>
+            <div className="animate-pulse flex justify-between w-full">
+              <div className='flex'>
+                <div className="mr-2 h-2 bg-slate-300 rounded w-[100px]"></div>
+              </div>
+              <div className='flex'>
+                <div className="mr-2 h-2 bg-slate-300 rounded w-[20px]"></div>
+                <div className="h-2 bg-slate-300 rounded w-[50px]"></div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className='mt-6'>
+        <div className="mb-4 h-2 bg-slate-300 rounded w-[100px]"></div>
+
+        {[...new Array(2)].map((_, index) => (
+          <div className="shadow rounded-sm p-4 w-full bg-white mx-auto border-b-2" key={`loading-${index}`}>
+            <div className="animate-pulse flex justify-between w-full">
+              <div className='flex'>
+                <div className="mr-2 h-2 bg-slate-300 rounded w-[100px]"></div>
+              </div>
+              <div className='flex'>
+                <div className="mr-2 h-2 bg-slate-300 rounded w-[20px]"></div>
+                <div className="h-2 bg-slate-300 rounded w-[50px]"></div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
