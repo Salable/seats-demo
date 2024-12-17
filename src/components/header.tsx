@@ -1,77 +1,35 @@
-'use client'
-import React, {useRef, useState} from "react";
-import useSWR from "swr";
-import {Session, User} from "@/app/settings/subscriptions/[uuid]/page";
+'use server'
 import Link from "next/link";
-import LoadingSpinner from "@/components/loading-spinner";
-import {useRouter} from "next/navigation";
-import {useOnClickOutside} from "usehooks-ts";
 import {SalableLogo} from "@/components/salable-logo";
-import {LicenseCheckResponse} from "@/app/page";
-import {GetAllSubscriptionsResponse} from "@/app/api/subscriptions/route";
+import {Dropdown} from "@/components/dropdown";
+import {getSession} from "@/fetch/session";
+import {getOneUser} from "@/fetch/users";
 
-export const Header = () => {
-  const router = useRouter();
-  const [dropDownOpen, setDropDownOpen] = useState(false);
-  const [loggingOut, setLoggingOut] = useState(false);
-  const ref = useRef(null);
-  const {data: session, mutate: mutateSession, isLoading: isLoadingSession, isValidating: isValidatingSession } = useSWR<Session>(`/api/session`)
-  const {data: user, mutate: mutateUsers, isLoading: isLoadingUser, isValidating: isValidatingUser } = useSWR<User>(`/api/users/${session?.uuid}`)
-  const {mutate: mutateLicenseCheck} = useSWR<LicenseCheckResponse>(`/api/licenses/check`)
-  const {data: owner} = useSWR<string>(`/api/organisations/${session?.organisationUuid}/owner`)
-
-  const clickOutside = () => {
-    setDropDownOpen(false)
+export const Header = async () => {
+  const session = await getSession();
+  if (!session?.uuid) {
+    return (
+      <Link className='p-3 text-white rounded-md leading-none bg-blue-700 hover:bg-blue-800 transition w-full text-center text-sm' href="/sign-in">Sign in</Link>
+    )
   }
-  useOnClickOutside(ref, clickOutside)
+  const user = await getOneUser(session.uuid, session.organisationUuid);
 
   return (
-    <header className='bg-white'>
-      <div className='max-w-[1000px] m-auto py-4 flex justify-between items-center'>
+    <header className='bg-white px-6'>
+      <div className='max-w-[1500px] m-auto py-4 flex justify-between items-center'>
         <Link className='flex items-center' href='/'>
           <div className='w-[30px] mr-2'><SalableLogo/></div>
-          <span>Salable Seats Demo</span>
+          <span>Salable Per Seat Demo</span>
         </Link>
-        <div className='flex items-center'>
+        <div>
           <div className="flex justify-between items-center">
-            {session?.uuid ? (
-              <div ref={ref} className={`relative hover:bg-white ${dropDownOpen && "bg-white rounded-br-none"}`}>
-                <div onClick={() => setDropDownOpen(!dropDownOpen)} className='w-[38px] h-[38px] cursor-pointer rounded-full bg-blue-200 leading-none flex items-center justify-center'>
-                  <span>{user?.username?.[0].toUpperCase()}</span>
-                </div>
-                {dropDownOpen && (
-                  <div className='absolute flex flex-col right-0 top-[45px] bg-white width-max-content text-right w-[200px] rounded-sm shadow z-10'>
-                    <div className='p-3 block f-full border-b text-sm text-center'>Hello, {user?.username}</div>
-                    {owner === session.uuid ?
-                      <Link className='p-3 block f-full border-b hover:bg-gray-50 text-sm' href={'/settings/subscriptions'} onClick={() => setDropDownOpen(false)}>Subscriptions</Link>
-                      : null }
-                    <Link className='p-3 block f-full border-b hover:bg-gray-50 text-sm' href={'/settings/organisations'} onClick={() => setDropDownOpen(false)}>Organisations</Link>
-                    <Link className='p-3 block f-full border-b hover:bg-gray-50 text-sm' href={'/'} onClick={() => setDropDownOpen(false)}>Capabilities</Link>
-                    <button className='p-3 block f-full text-right hover:bg-gray-50 text-sm' onClick={async () => {
-                      try {
-                        setLoggingOut(true)
-                        await fetch('/api/session', {
-                          method: 'DELETE'
-                        })
-                        await mutateSession()
-                        router.push('/sign-in')
-                        await mutateLicenseCheck()
-                        await mutateUsers()
-                        setLoggingOut(false)
-                        setDropDownOpen(false)
-                      } catch (e) {
-                        console.log(e)
-                      }
-                    }}>{!loggingOut ? "Sign out" :
-                      <div className='w-[15px]'><LoadingSpinner fill="#1e4fd8"/></div>}</button>
-                  </div>
-                )}
-              </div>
-            ) : null}
-
-            {!isLoadingSession && !isValidatingSession && !session?.uuid ? (
-              <Link className='p-3 text-white rounded-md leading-none bg-blue-700 w-full text-center text-sm' href="/sign-in">Sign in</Link>
-            ) : null}
+            {user.data ? (
+              <Dropdown user={user.data} />
+            ) : user.error ? (
+              <span className='text-red-600 text-sm'>{user.error}</span>
+            ) : (
+              <Link className='p-3 text-white rounded-md leading-none bg-blue-700 hover:bg-blue-800 transition w-full text-center text-sm' href="/sign-in">Sign in</Link>
+            )}
           </div>
         </div>
       </div>

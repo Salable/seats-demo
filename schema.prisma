@@ -1,0 +1,43 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Organisation {
+  uuid   String                 @id @default(uuid())
+  name   String                 @unique
+  users  UsersOnOrganisations[]
+  tokens Token[]
+}
+
+model User {
+  uuid          String                 @id @default(uuid())
+  username      String?                @unique
+  email         String                 @unique
+  salt          String?                @unique
+  hash          String?                @unique
+  organisations UsersOnOrganisations[]
+  tokens        Token[]
+}
+
+model UsersOnOrganisations {
+  organisation     Organisation @relation(fields: [organisationUuid], references: [uuid])
+  organisationUuid String
+  user             User         @relation(fields: [userUuid], references: [uuid])
+  userUuid         String       @unique
+  isAdmin          Boolean      @default(false)
+}
+
+model Token {
+  uuid             String       @id @default(uuid())
+  value            String       @unique
+  user             User         @relation(fields: [userUuid], references: [uuid])
+  userUuid         String
+  organisation     Organisation @relation(fields: [organisationUuid], references: [uuid])
+  organisationUuid String
+}
