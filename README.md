@@ -1,3 +1,4 @@
+![Salable Per Seat Pricing Demo](https://raw.githubusercontent.com/Salable/seats-demo/refs/heads/main/public/per-seat-banner.gif)
 # Salable Per Seat Pricing Demo
 
 This app demonstrates using [per seat](https://www.salable.app/features/per-seat-pricing) billing with Salable.
