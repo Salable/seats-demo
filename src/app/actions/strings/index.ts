@@ -7,15 +7,15 @@ import {cookies} from "next/headers";
 import {licenseCheck} from "@/fetch/licenses/check";
 import {env} from "@/app/environment";
 
-const ZodCreateStringRequestBody = z.object({
+const zodCreateStringRequestBody = z.object({
   bytes: z.union([z.literal('16'), z.literal('32'), z.literal('64'), z.literal('128')]),
 });
 
-type CreateStringRequestBody = z.infer<typeof ZodCreateStringRequestBody>
+type CreateStringRequestBody = z.infer<typeof zodCreateStringRequestBody>
 
 export const generateString = async (formData: CreateStringRequestBody) =>{
   try {
-    const data = ZodCreateStringRequestBody.parse(formData)
+    const data = zodCreateStringRequestBody.parse(formData)
     const session = await getIronSession<Session>(await cookies(), { password: env.SESSION_COOKIE_PASSWORD, cookieName: env.SESSION_COOKIE_NAME });
     if (!session?.uuid) {
       return {

@@ -13,16 +13,16 @@ export type Session = {
   organisationUuid: string;
 }
 
-const ZodSignInRequestBody = z.object({
+const zodSignInRequestBody = z.object({
   username: z.string(),
   password: z.string(),
 });
-type SignInRequestBody = z.infer<typeof ZodSignInRequestBody>
+type SignInRequestBody = z.infer<typeof zodSignInRequestBody>
 
 
 export async function signIn(formData: SignInRequestBody) {
   try {
-    const data = ZodSignInRequestBody.parse(formData)
+    const data = zodSignInRequestBody.parse(formData)
     const user = await prismaClient.user.findUnique({
       where: {username: data.username},
       include: {organisations: true}
