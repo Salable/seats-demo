@@ -33,34 +33,14 @@ export default async function Home({searchParams}: {
   return (
     <main>
       <div className='max-w-[1200px] m-auto text-sm'>
-        <div className='md:grid md: md:grid-cols-2 md:gap-6'>
-          <div>
-            <p className='text-lg mb-3'>
-              The product in the demo generates strings with random data which vary in size based on the number of bytes
-              selected. To get access to the product a user must create an organisation and sign up then subscribe to a
-              plan. The email of the sign up does not have to be real, this is just for demo purposes. This product is
-              using test mode in Salable which allows use of test cards. Use the card number <span className='font-mono'>4242 4242 4242 4242</span>, expiry
-              is any date in the future and CVC can be any three-digit number. The byte sizes
-              for the strings are feature locked behind different plans. Once a user has subscribed they will be able
-              access some or all of these features depending on what plan they are licensed on.
-            </p>
-            <p className='text-lg mb-3'>
-              Once you have signed up you will be assigned as an admin to the organisation you created. This will enable
-              you to test creating/inviting other users to your organisation via an invite link that has a token in it.
-              You can use this link to paste into a new browser window and simulate a new user signing up to your
-              organisation. The admin of the organisation can then assign a seat to the new user which will license them
-              to use the product.
-            </p>
-          </div>
-          <div className='mb-6'>
-            <h1 className='text-4xl font-bold text-gray-900 mr-4 text-center'>
-              Random String Generator
-            </h1>
-            <div className='mt-6'>
-              <Suspense fallback={<Loading/>}>
-                <StringGenerator search={await searchParams}/>
-              </Suspense>
-            </div>
+        <div className='mb-6'>
+          <h1 className='text-4xl font-bold text-gray-900 mr-4 text-center'>
+            Random String Generator
+          </h1>
+          <div className='mt-6'>
+            <Suspense fallback={<Loading/>}>
+              <StringGenerator search={await searchParams}/>
+            </Suspense>
           </div>
         </div>
       </div>
@@ -108,7 +88,7 @@ const StringGenerator = async ({search}: { search: Record<string, string> }) => 
                 <div className='flex mt-2'>
                   <Link
                     href={'/dashboard/subscriptions'}
-                    className='p-3 text-white rounded-md leading-none bg-blue-700 hover:bg-blue-800 transition'
+                    className='p-3 text-white rounded-md leading-none font-bold bg-blue-700 hover:bg-blue-800 transition'
                   >
                     Upgrade now
                   </Link>
@@ -122,7 +102,7 @@ const StringGenerator = async ({search}: { search: Record<string, string> }) => 
               <div className='rounded-md inline-flex flex-col mx-auto mt-6 p-3 border-2'>
                 <p>To start creating secure strings subscribe to a plan from our pricing table and get started!</p>
                 <div className='mt-3'>
-                  <Link href='/pricing' className='inline-block p-3 text-white rounded-md leading-none bg-blue-700 hover:bg-blue-800 transition'>
+                  <Link href='/pricing' className='inline-block p-3 text-white rounded-md leading-none font-bold bg-blue-700 hover:bg-blue-800 transition'>
                     Pricing
                   </Link>
                 </div>

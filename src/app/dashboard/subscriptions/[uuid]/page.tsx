@@ -112,7 +112,6 @@ const Seats = async ({uuid}: { uuid: string }) => {
     if (!seats.data?.data.find((s) => s.granteeId === user.uuid)) arr.push(user)
     return arr
   }, [])
-  console.log(nonLicensedUsers)
   const pendingInvites = users.data?.filter((u) => !u.username && u.email)
   const pendingInvitesOnSubscription = pendingInvites?.reduce((arr: User[], user) => {
     if (seats.data?.data?.find((l) => user.uuid === l.granteeId)) arr.push(user)
@@ -120,7 +119,7 @@ const Seats = async ({uuid}: { uuid: string }) => {
   }, [])
   return (
     <>
-      <div>
+      <div className='mb-6 md:mb-0'>
         {seats.data && users.data && nonLicensedUsers ? (
           <>
             <div className='flex flex-col rounded-sm shadow bg-white'>

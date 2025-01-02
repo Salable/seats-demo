@@ -2,7 +2,7 @@
 import LoadingSpinner from "@/components/loading-spinner";
 import React, {useRef} from "react";
 import {useForm} from "react-hook-form";
-import {usePathname, useRouter, useSearchParams} from "next/navigation";
+import {useSearchParams} from "next/navigation";
 import {useOnClickOutside} from "usehooks-ts";
 import {Session} from "@/app/actions/sign-in";
 import {createToken} from "@/app/actions/invite-user";
@@ -15,19 +15,12 @@ type ModalFormValues = {
 export const InviteUserModal = ({session}: {
   session: Session,
 }) => {
-  const router = useRouter()
   const searchParams = useSearchParams()
-  const pathname = usePathname()
   const licenseUuid = searchParams.get("licenseUuid")
   const { register, reset, setError, handleSubmit, formState: { errors, isSubmitting } } = useForm<ModalFormValues>();
   const ref = useRef(null)
-
   const removeQueryParams = () => {
-    const params = new URLSearchParams(searchParams.toString())
-    params.delete("modalOpen")
-    params.delete("licenseUuid")
-    params.delete("subscriptionUuid")
-    router.push(pathname + '?' + params.toString())
+    history.pushState(null, '', '?')
   }
   const clickOutside = () => {
     removeQueryParams()
@@ -86,7 +79,7 @@ export const InviteUserModal = ({session}: {
               </fieldset>
 
               <div>
-                <button className={`p-4 text-white rounded-md leading-none bg-blue-700 flex items-center`}>
+                <button className={`p-4 text-white rounded-md leading-none font-bold bg-blue-700 flex items-center`}>
                   {isSubmitting ? <div className='w-[15px] mr-2'><LoadingSpinner fill="white"/></div> : ''} Send invite
                 </button>
               </div>

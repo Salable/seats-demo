@@ -19,8 +19,8 @@ export const Footer = () => (
         <div className='p-9 border border-gray-500'>
           <p><span className='font-bold text-white'>Get answers and guidance</span> from our own developers and commercial model consultants. If you have an implementation query or you are not sure which pricing model to use for your app, our people are ready to help. </p>
           <Link
-            href='/'
-            className='border border-black rounded-md p-3 leading-none inline-flex items-center mt-6 text-purple-400 fill-purple-400 text-sm font-bold transition hover:bg-purple-400 hover:text-gray-900 hover:fill-gray-900'
+            href='https://discord.com/channels/1064480618546737163/1219751191483781214'
+            className='border border-black rounded-md p-4 leading-none inline-flex items-center mt-6 text-purple-400 fill-purple-400 text-sm font-bold transition hover:bg-purple-400 hover:text-gray-900 hover:fill-gray-900'
           >
             <div className='h-[16px] w-[20px] mr-2'>
               <DiscordLogo />
@@ -35,8 +35,8 @@ export const Footer = () => (
           </div>
           <div>
             <Link
-              href='/'
-              className='border border-black rounded-md p-3 leading-none inline-flex items-center mt-6 text-green-400 fill-green-400 text-sm font-bold transition hover:bg-green-400 hover:text-gray-900 hover:fill-gray-900'
+              href='https://github.com/Salable/seats-demo'
+              className='border border-black rounded-md p-4 leading-none inline-flex items-center mt-6 text-green-400 fill-green-400 text-sm font-bold transition hover:bg-green-400 hover:text-gray-900 hover:fill-gray-900'
             >
               <div className='h-[20px] w-[20px] mr-2'>
                 <GithubLogo />
@@ -47,7 +47,7 @@ export const Footer = () => (
         </div>
         <div className='p-9 border border-gray-500'>
         <p><span className='font-bold text-white'>Sign up for free</span> to Salable, the first subscription licensing platform designed for SaaS apps and services. Salable supports many strategic billing models including per seat billing.</p>
-          <Link href='https://salable.app/signup' className='inline-flex p-3 text-white rounded-md leading-none bg-blue-700 hover:bg-blue-800 transition mt-6 text-sm font-bold'>Sign up to Salable</Link>
+          <Link href='https://salable.app/signup' className='inline-flex p-4 text-white rounded-md leading-none font-bold bg-blue-700 hover:bg-blue-800 transition mt-6 text-sm'>Sign up to Salable</Link>
         </div>
       </div>
     </div>

@@ -71,7 +71,7 @@ export const SignUpForm = () => {
       </fieldset>
 
       <div className='mb-4'>
-        <button className={`p-4 text-white rounded-md leading-none bg-blue-700 hover:bg-blue-800 transition`}>
+        <button className={`p-4 text-white rounded-md leading-none font-bold bg-blue-700 hover:bg-blue-800 transition`}>
           {!isSubmitting ? "Sign up" : <div className='w-[15px]'><LoadingSpinner fill="white"/></div>}
         </button>
       </div>

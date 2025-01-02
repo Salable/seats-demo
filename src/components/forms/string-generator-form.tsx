@@ -42,7 +42,7 @@ export const StringGeneratorForm = ({check}: {check: LicenseCheckResponse | null
       <>
         <label
           htmlFor={size}
-          className={`p-3 inline-flex items-center leading-none border-2 mr-2 rounded-md
+          className={`p-3 inline-flex items-center leading-none border-2 mr-2 rounded-md font-bold
             ${watch().bytes === size ? "border-black bg-black text-white" : ""}
             ${capability ? "cursor-pointer" : ""}
             ${!capability ? "bg-gray-200" : ""}
@@ -69,7 +69,7 @@ export const StringGeneratorForm = ({check}: {check: LicenseCheckResponse | null
 
           {check ? (
             <button
-              className={`p-3 text-white rounded-md leading-none bg-blue-700 hover:bg-blue-800 transition text-sm`}
+              className={`p-3 text-white rounded-md leading-none font-bold bg-blue-700 hover:bg-blue-800 transition text-sm`}
               disabled={isSubmitting}
             >{!isSubmitting ? "Generate" :
               <div className='w-[15px]'><LoadingSpinner fill="white"/></div>}</button>
@@ -92,7 +92,7 @@ const CopyButton = ({text}: {text: string}) => {
   const [showMessage, setShowMessage] = useState(false)
   return (
     <button
-      className='rounded-r-full bg-blue-700 hover:bg-blue-800 transition uppercase px-2 pr-[12px] text-white text-xs relative'
+      className='rounded-r-full font-bold bg-blue-700 hover:bg-blue-800 transition uppercase px-2 pr-[12px] text-white text-xs relative'
       onClick={() => {
         navigator.clipboard.writeText(text)
         setShowMessage(true)

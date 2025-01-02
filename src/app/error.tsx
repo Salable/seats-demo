@@ -1,5 +1,4 @@
 'use client'
-
 import { useEffect } from 'react'
 
 export default function Error({
@@ -17,7 +16,7 @@ export default function Error({
     <div className='max-w-[1000px] mx-auto'>
       <h2 className='text-3xl'>Something went wrong!</h2>
       <button
-        className='p-4 text-white rounded-md leading-none bg-blue-700 hover:bg-blue-800 transition flex items-center justify-center mr-2 mt-6'
+        className='p-4 text-white rounded-md leading-none font-bold bg-blue-700 hover:bg-blue-800 transition flex items-center justify-center mr-2 mt-6'
         onClick={() => reset()}
       >
         Try again

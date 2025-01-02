@@ -61,14 +61,14 @@ export const UpdateSubscription = ({seatCount, subscription}: {seatCount: number
       </div>
       <div className='border-b-2 flex justify-center items-center pb-4'>
         <button
-          className={`flex items-center justify-center leading-none text-xl p-3 text-white rounded-full h-[38px] w-[38px] bg-blue-700 hover:bg-blue-800 transition disabled:bg-gray-400`}
+          className={`flex items-center justify-center leading-none text-xl p-3 text-white rounded-full h-[38px] w-[38px] font-bold bg-blue-700 hover:bg-blue-800 transition disabled:bg-gray-400`}
           disabled={updatedSeatCount === subscription?.plan.perSeatAmount || subscription.status === 'CANCELED'}
           onClick={handleClickRemoveSeats}>
           -
         </button>
         <div className='px-4 text-xl'>{updatedSeatCount}</div>
         <button
-          className={`flex items-center justify-center leading-none text-xl p-3 text-white rounded-full h-[38px] w-[38px] bg-blue-700 hover:bg-blue-800 transition disabled:bg-gray-400`}
+          className={`flex items-center justify-center leading-none text-xl p-3 text-white rounded-full h-[38px] w-[38px] font-bold bg-blue-700 hover:bg-blue-800 transition disabled:bg-gray-400`}
           onClick={handleClickAddSeats}
           disabled={subscription.status === 'CANCELED'}
         >
@@ -111,7 +111,7 @@ export const UpdateSubscription = ({seatCount, subscription}: {seatCount: number
       ) : null}
       <div className='flex justify-end mt-3'>
         <button
-          className={`w-full p-4 rounded-md leading-none flex items-center justify-center text-white bg-blue-700 hover:bg-blue-800 transition disabled:bg-gray-400`}
+          className={`w-full p-4 rounded-md leading-none flex items-center justify-center text-white font-bold bg-blue-700 hover:bg-blue-800 transition disabled:bg-gray-400`}
           onClick={handleClickUpdateSubscription}
           disabled={updatedSeatCount === seatCount || subscription.status === 'CANCELED'}
         >

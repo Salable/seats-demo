@@ -83,7 +83,7 @@ export const AcceptInviteForm = ({organisationName}: {organisationName: string})
 
           <div>
             <button
-              className={`p-4 text-white rounded-md leading-none bg-blue-700`}
+              className={`p-4 text-white rounded-md leading-none font-bold bg-blue-700`}
             >
               {!isSubmitting ? "Sign up" : <div className='w-[15px]'><LoadingSpinner fill="white"/></div>}
             </button>

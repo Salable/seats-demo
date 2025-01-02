@@ -18,7 +18,7 @@ export default function UsersPage() {
       <div className="w-full font-sans text-sm">
         <div className='max-w-[1000px] m-auto'>
           <Suspense fallback={<LoadingSkeleton />}>
-            <Users/>
+            <Users />
           </Suspense>
         </div>
       </div>
@@ -29,7 +29,7 @@ export default function UsersPage() {
 const Users = async () => {
   const session = await getSession();
   if (!session?.uuid) {
-    redirect('/sign-in')
+    redirect('/')
   }
   const organisation = await getOneOrganisation(session.organisationUuid)
   const users = await getAllUsers(session.organisationUuid)

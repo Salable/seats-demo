@@ -1,7 +1,6 @@
 'use client'
 import React, {useRef, useState} from "react";
 import {useOnClickOutside} from "usehooks-ts";
-import {usePathname, useRouter} from "next/navigation";
 import { User } from "@prisma/client";
 import {License} from "@/fetch/licenses/get-all";
 import {Session} from "@/app/actions/sign-in";
@@ -24,8 +23,6 @@ export const AssignUser = (
     session: Session
   },
 ) => {
-  const router = useRouter()
-  const pathname = usePathname()
   const isPending = assignedUser && !assignedUser.username
   const isUser = assignedUser?.uuid === session.uuid
   const ref = useRef(null)
@@ -138,7 +135,7 @@ export const AssignUser = (
                 params.set("modalOpen", "true")
                 params.set("licenseUuid", license.uuid)
                 params.set("subscriptionUuid", subscriptionUuid)
-                router.push(`${pathname}?${params.toString()}`)
+                history.pushState(null, '', `?${params.toString()}`)
               }}
             > Invite user</button>
           ) : null}

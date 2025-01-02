@@ -17,7 +17,7 @@ export const ChangePlanButton = ({subscriptionUuid, planUuid, planName}: {subscr
   return (
     <button
       onClick={handleClick}
-      className='p-4 text-white rounded-md leading-none bg-blue-700 hover:bg-blue-800 transition flex items-center justify-center mr-2'
+      className='p-4 text-white rounded-md leading-none font-bold bg-blue-700 hover:bg-blue-800 transition flex items-center justify-center mr-2'
       disabled={isChangingSubscription}
     >
       {isChangingSubscription ? (
