@@ -5,15 +5,15 @@ import {useForm} from "react-hook-form";
 import {useSearchParams} from "next/navigation";
 import {useOnClickOutside} from "usehooks-ts";
 import {Session} from "@/app/actions/sign-in";
-import {createToken} from "@/app/actions/invite-user";
-import {appBaseUrl} from "@/app/constants";
+import {inviteUser} from "@/app/actions/invite-user";
 
 type ModalFormValues = {
   email: string;
 };
 
-export const InviteUserModal = ({session}: {
+export const InviteUserModal = ({session, revalidatePage}: {
   session: Session,
+  revalidatePage: string
 }) => {
   const searchParams = useSearchParams()
   const licenseUuid = searchParams.get("licenseUuid")
@@ -30,20 +30,21 @@ export const InviteUserModal = ({session}: {
 
   const onSubmit = handleSubmit(async (values) => {
     try {
-      const inviteUser = await createToken({
-        organisationUuid: session.organisationUuid,
-        email: values.email,
-        ...(licenseUuid && {licenseUuid})
-      })
-      if (!inviteUser.data) {
+      const inviteUserResponse = await inviteUser(
+        {
+          organisationUuid: session.organisationUuid,
+          email: values.email,
+          ...(licenseUuid && {licenseUuid})
+        },
+        revalidatePage
+      )
+      if (inviteUserResponse?.error) {
         setError("root.serverError", {
           type: "400",
-          message: inviteUser.error ?? 'Invite user failed'
+          message: inviteUserResponse.error ?? 'Invite user failed'
         })
         return
       }
-      const link = `${appBaseUrl}/accept-invite?token=${inviteUser.data.token}`
-      await navigator.clipboard.writeText(link);
       removeQueryParams()
     } catch (e) {
       console.log(e)

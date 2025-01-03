@@ -64,7 +64,13 @@ export const AssignUser = (
       setIsUpdatingUser(false)
     }
   }
-
+  const handleClickInviteUser = () => {
+    const params = new URLSearchParams()
+    params.set("modalOpen", "true")
+    params.set("licenseUuid", license.uuid)
+    params.set("subscriptionUuid", subscriptionUuid)
+    history.pushState(null, '', `?${params.toString()}`)
+  }
   return (
     <div className={`border-b-2`} ref={ref}>
       <div className='p-3 flex justify-between'>
@@ -121,23 +127,14 @@ export const AssignUser = (
           ) : null}
           {isUser ? <div className='p-1 ml-2 rounded-sm text-gray-500 bg-gray-200 text-xs font-bold uppercase'>You</div> : null}
           {assignedUser?.uuid && assignedUser.uuid !== session.uuid ? (
-            <button
-              className='p-2 border-2 rounded-md text-gray-500 text-xs'
-              onClick={handleClickUnassignUser}
-            >
+            <button className='p-2 border-2 rounded-md text-gray-500 text-xs font-bold' onClick={handleClickUnassignUser}>
               Unassign user
             </button>
           ) : null}
           {!assignedUser ? (
-            <button className='p-2 border-2 rounded-md text-gray-500 text-xs'
-              onClick={() => {
-                const params = new URLSearchParams()
-                params.set("modalOpen", "true")
-                params.set("licenseUuid", license.uuid)
-                params.set("subscriptionUuid", subscriptionUuid)
-                history.pushState(null, '', `?${params.toString()}`)
-              }}
-            > Invite user</button>
+            <button className='p-2 border-2 rounded-md text-gray-500 text-xs font-bold' onClick={handleClickInviteUser}>
+              Invite user
+            </button>
           ) : null}
         </div>
       </div>

@@ -171,7 +171,7 @@ const Seats = async ({uuid}: { uuid: string }) => {
           </>
         ) : null}
       </div>
-      <InviteUserModal session={session} />
+      <InviteUserModal session={session} revalidatePage={`/dashboard/subscriptions/${uuid}`} />
     </>
   )
 }
@@ -179,13 +179,13 @@ const Seats = async ({uuid}: { uuid: string }) => {
 const UpdateSubscriptionPanel = async ({uuid}: { uuid: string }) => {
   const subscription = await getOneSubscription(uuid)
   return (
-    <>
+    <div>
       {subscription.data ? (
         <UpdateSubscription seatCount={subscription.data.quantity} subscription={subscription.data}/>
       ) : subscription.error ? (
         <FetchError error={subscription.error}/>
       ) : null}
-    </>
+    </div>
   )
 }
 

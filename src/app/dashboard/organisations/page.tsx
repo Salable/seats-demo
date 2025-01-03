@@ -28,13 +28,10 @@ export default function UsersPage() {
 
 const Users = async () => {
   const session = await getSession();
-  if (!session?.uuid) {
-    redirect('/')
-  }
+  if (!session?.uuid) redirect('/')
   const organisation = await getOneOrganisation(session.organisationUuid)
   const users = await getAllUsers(session.organisationUuid)
   const pendingInvites = users.data?.filter((u) => !u.username)
-
   return (
     <>
       {organisation.data ? (
@@ -111,7 +108,7 @@ const Users = async () => {
           </div>
         </>
       ) : null}
-      <InviteUserModal session={session} />
+      <InviteUserModal session={session} revalidatePage='/dashboard/organisations' />
     </>
   )
 }

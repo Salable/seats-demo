@@ -20,7 +20,7 @@ export const CopyInviteLink = ({token, licenseUuid}: {token: string, licenseUuid
   }
   return (
     <button
-      className='p-2 border-2 rounded-md text-gray-500 text-xs relative'
+      className='p-2 border-2 rounded-md text-gray-500 text-xs relative font-bold'
       onClick={handleClick}
     >
       Copy invite link

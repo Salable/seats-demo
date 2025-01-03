@@ -5,7 +5,8 @@ import {prismaClient} from "../../../../prisma";
 import {salableApiBaseUrl} from "@/app/constants";
 import {env} from "@/app/environment";
 import {getErrorMessage} from "@/app/actions/get-error-message";
-import { Result } from "../checkout-link";
+import {revalidatePath} from "next/cache";
+import {redirect} from "next/navigation";
 
 const zodCreateTokenRequestBody = z.object({
   organisationUuid: z.string().uuid(),
@@ -15,7 +16,7 @@ const zodCreateTokenRequestBody = z.object({
 
 type CreateTokenRequestBody = z.infer<typeof zodCreateTokenRequestBody>
 
-export async function createToken(formData: CreateTokenRequestBody): Promise<Result<{token: string}>> {
+export async function inviteUser(formData: CreateTokenRequestBody, revalidatePage: string) {
   try {
     const data = zodCreateTokenRequestBody.parse(formData)
     const existingOrganisation = await prismaClient.organisation.findUnique({
@@ -45,7 +46,6 @@ export async function createToken(formData: CreateTokenRequestBody): Promise<Res
         error: 'Invite user failed'
       }
     }
-
     const token = randomBytes(32).toString('hex')
     const createToken = await prismaClient.token.create({
       data: {
@@ -90,10 +90,6 @@ export async function createToken(formData: CreateTokenRequestBody): Promise<Res
         }
       }
     }
-    return {
-      data: {token},
-      error: null
-    }
   } catch (error) {
     console.log(error)
     return {
@@ -101,4 +97,6 @@ export async function createToken(formData: CreateTokenRequestBody): Promise<Res
       error: 'Failed to invite user'
     }
   }
+  revalidatePath(revalidatePage)
+  redirect(revalidatePage)
 }
