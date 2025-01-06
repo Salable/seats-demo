@@ -28,3 +28,7 @@ User details are stored in a Turso database, and passwords are securely hashed w
 
 ### User sessions
 [Iron Session](https://github.com/vvo/iron-session) is used for storing user session data. 
+
+## Need some help?
+Get answers and guidance from our own developers and commercial model consultants. If you have an implementation query, or you are not sure which pricing model to use for your app, our people are ready to help.
+[![Join salable discord](https://raw.githubusercontent.com/Salable/seats-demo/refs/heads/main/public/discord-button.png?token=GHSAT0AAAAAACMKGD334OISGS2OXLK7TK6YZ3WY5JA)](https://discord.com/channels/1064480618546737163/1219751191483781214)
