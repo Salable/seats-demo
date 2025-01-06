@@ -2,6 +2,7 @@
 import {Session} from "@/app/actions/sign-in";
 import {appBaseUrl, salableApiBaseUrl, salableApiKeyPlansRead} from "@/app/constants";
 import {getErrorMessage} from "@/app/actions/get-error-message";
+import {env} from "@/app/environment";
 
 export type Result<T> =
   | { data: T; error: null }
@@ -22,7 +23,7 @@ export async function getCheckoutLink(session: Session, planUuid: string): Promi
     })
     const res = await fetch(
       `${salableApiBaseUrl}/plans/${planUuid}/checkoutlink?${params.toString()}`,
-      {headers: {'x-api-key': salableApiKeyPlansRead}}
+      {headers: {'x-api-key': env.SALABLE_API_KEY}}
     )
     if (res.ok) {
       const data = await res.json() as CheckoutLink
