@@ -9,7 +9,6 @@ if(!process.env.NEXT_PUBLIC_PRODUCT_UUID) throw new Error('Missing env NEXT_PUBL
 if(!process.env.NEXT_PUBLIC_APP_BASE_URL) throw new Error('Missing env NEXT_PUBLIC_APP_BASE_URL')
 
 export const salableApiBaseUrl = process.env.NEXT_PUBLIC_SALABLE_API_BASE_URL
-export const salableApiKeyPlansRead = process.env.NEXT_PUBLIC_SALABLE_API_KEY_PLANS_READ
 export const salableBasicPlanUuid = process.env.NEXT_PUBLIC_SALABLE_PLAN_UUID
 export const salableProPlanUuid = process.env.NEXT_PUBLIC_SALABLE_PRO_PLAN_UUID
 export const salableProductUuid = process.env.NEXT_PUBLIC_PRODUCT_UUID
