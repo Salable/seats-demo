@@ -111,9 +111,13 @@ const BasicPlanPricingTableButton = async () => {
           <div className='mr-1'><TickIcon fill='#FFF' height={14} width={14}/></div>
           Already subscribed
         </div>
-      ) : check?.data?.capabilities?.find((a) => a.capability === 'basic') && !check?.data?.capabilities?.find((a) => a.capability === 'pro') ? (
-        <Link href='/src/app/dashboard/subscriptions'
-              className='block p-4 text-white rounded-md leading-none font-bold bg-blue-700 hover:bg-blue-800 transition w-full text-center'>Move to Basic plan</Link>
+      ) : check?.data?.capabilities?.find((a) => a.capability === 'pro') && !check?.data?.capabilities?.find((a) => a.capability === 'basic') ? (
+        <Link
+          href='/dashboard/subscriptions'
+          className='block p-4 text-white rounded-md leading-none font-bold bg-blue-700 hover:bg-blue-800 transition w-full text-center'
+        >
+          Move to Basic plan
+        </Link>
       ) : (
         <PlanButton session={session} planUuid={salableBasicPlanUuid}/>
       )}
