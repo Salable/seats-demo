@@ -13,12 +13,14 @@ export const AssignUser = (
     assignedUser,
     nonLicensedUsers,
     subscriptionUuid,
+    subscriptionStatus,
     license,
     session
   }: {
     assignedUser: User | null,
     nonLicensedUsers: User[],
     subscriptionUuid: string,
+    subscriptionStatus: string,
     license: License,
     session: Session
   },
@@ -75,18 +77,20 @@ export const AssignUser = (
     <div className={`border-b-2`} ref={ref}>
       <div className='p-3 flex justify-between'>
         <div>
-          <div
-            className={`flex items-center ${!isUser ? 'cursor-pointer' : ''}`}
+          <button
+            className={`flex items-center ${!isUser && subscriptionStatus !== 'CANCELED' ? 'cursor-pointer' : ''}`}
+            aria-label={assignedUser?.username ? 'Reassign seat' : 'Assign seat'}
             onClick={() => {
               if (!isUser) setShowUsers(!showUsers)
             }}
+            disabled={subscriptionStatus === 'CANCELED'}
           >
             <div className='rounded-full mr-3'>
               <div className='w-[38px] h-[38px] cursor-pointer rounded-full bg-blue-200 leading-none flex items-center justify-center'>
                 <span>{!isPending ? assignedUser?.username?.[0].toUpperCase() : "?"}</span>
               </div>
             </div>
-            <div>
+            <div className='text-left'>
               {assignedUser?.username ? (
                 <div>{assignedUser.username}</div>
               ) : null}
@@ -101,7 +105,7 @@ export const AssignUser = (
               ) : null}
               {assignedUser ? <div className='text-xs text-gray-500'>{assignedUser.email}</div> : null}
             </div>
-          </div>
+          </button>
           {showUsers ? (
             <div className='absolute border-2 bg-white'>
               {nonLicensedUsers.map((user, i) => (
@@ -126,15 +130,19 @@ export const AssignUser = (
             <div className='mb-1'><span className='p-1 bg-yellow-300 text-xs rounded-sm mr-2 uppercase font-bold'>Pending</span></div>
           ) : null}
           {isUser ? <div className='p-1 ml-2 rounded-sm text-gray-500 bg-gray-200 text-xs font-bold uppercase'>You</div> : null}
-          {assignedUser?.uuid && assignedUser.uuid !== session.uuid ? (
-            <button className='p-2 border-2 rounded-md text-gray-500 text-xs font-bold' onClick={handleClickUnassignUser}>
-              Unassign user
-            </button>
-          ) : null}
-          {!assignedUser ? (
-            <button className='p-2 border-2 rounded-md text-gray-500 text-xs font-bold' onClick={handleClickInviteUser}>
-              Invite user
-            </button>
+          {subscriptionStatus !== 'CANCELED' ? (
+            <>
+              {assignedUser?.uuid && assignedUser.uuid !== session.uuid ? (
+                <button className='p-2 border-2 rounded-md text-gray-500 text-xs font-bold' onClick={handleClickUnassignUser}>
+                  Unassign user
+                </button>
+              ) : null}
+              {!assignedUser ? (
+                <button className='p-2 border-2 rounded-md text-gray-500 text-xs font-bold' onClick={handleClickInviteUser}>
+                  Invite user
+                </button>
+              ) : null}
+            </>
           ) : null}
         </div>
       </div>

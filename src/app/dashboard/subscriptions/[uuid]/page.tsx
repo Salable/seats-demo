@@ -131,6 +131,7 @@ const Seats = async ({uuid, subscription, session}: { uuid: string, subscription
                       assignedUser={assignedUser}
                       license={l}
                       subscriptionUuid={uuid}
+                      subscriptionStatus={subscription.status}
                       nonLicensedUsers={nonLicensedUsers}
                       key={`assign_users_${i}`}
                     />
