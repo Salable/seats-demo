@@ -1,4 +1,4 @@
-import {getOneSubscription} from "@/fetch/subscriptions";
+import {getOneSubscription, SalableSubscription} from "@/fetch/subscriptions";
 import { salableBasicPlanUuid, salableProPlanUuid} from "@/app/constants";
 import React, {Suspense} from "react";
 import {ChangePlanButton} from "@/components/change-plan-button";
@@ -16,6 +16,7 @@ import {User} from "@prisma/client";
 import {UpdateSubscription} from "@/components/update-subscription";
 import {InviteUserModal} from "@/components/invite-user-modal";
 import {CopyInviteLink} from "@/components/copy-invite-link";
+import {Session} from "@/app/actions/sign-in";
 
 export const metadata = {
   title: 'Subscription',
@@ -23,20 +24,29 @@ export const metadata = {
 
 export default async function SubscriptionPage({ params }: { params: Promise<{ uuid: string }> }) {
   const { uuid } = await params
+  const session = await getSession()
+  if (!session?.uuid) redirect('/')
+  const subscription = await getOneSubscription(uuid)
+  if (subscription.error) {
+    return (
+      <div className='max-w-[1000px] m-auto text-sm'>
+        <FetchError error={subscription.error}/>
+      </div>
+    )
+  }
+  if (subscription.data?.email !== session.email) redirect('/')
 
   return (
     <div className='max-w-[1000px] m-auto text-sm'>
       <Suspense fallback={<SubscriptionLoading />}>
-        <Subscription uuid={uuid} />
+        <Subscription subscription={subscription.data} />
       </Suspense>
       <div className='mt-6'>
         <div className='md:grid md:grid-cols-[2fr_1fr] md:gap-6'>
           <Suspense fallback={<SeatsLoading />}>
-            <Seats uuid={uuid} />
+            <Seats uuid={uuid} subscription={subscription.data} session={session} />
           </Suspense>
-          <Suspense fallback={<UpdateSubscriptionPanelLoading />}>
-            <UpdateSubscriptionPanel uuid={uuid} />
-          </Suspense>
+          <UpdateSubscription seatCount={subscription.data.quantity} subscription={subscription.data} />
         </div>
       </div>
       <div className='mt-6'>
@@ -51,62 +61,46 @@ export default async function SubscriptionPage({ params }: { params: Promise<{ u
   )
 }
 
-const Subscription = async ({uuid}: { uuid: string }) => {
-  const subscription = await getOneSubscription(uuid)
+const Subscription = async ({subscription}: { subscription: SalableSubscription }) => {
   return (
-    <div>
-      {subscription.data ? (
-        <>
-          <h1 className='text-3xl mb-6 flex items-center'>Subscription
-            <span className={`px-2 ml-2 py-2 rounded-md leading-none ${subscription.data.status === 'CANCELED' ? 'bg-red-200 text-red-500' : 'bg-green-200 text-green-700'} uppercase text-lg font-bold`}>
-              {subscription.data.status}
-            </span>
-          </h1>
-
-          <div className='mb-3'>
-            <div className='flex justify-between items-end mb-3'>
-              <div>
-                <div className='text-gray-500'>Plan</div>
-                <div className='text-xl'>{subscription.data.plan.displayName}</div>
-              </div>
-            </div>
+    <>
+      <h1 className='text-3xl mb-6 flex items-center'>Subscription
+        <span className={`px-2 ml-2 py-2 rounded-md leading-none ${subscription.status === 'CANCELED' ? 'bg-red-200 text-red-500' : 'bg-green-200 text-green-700'} uppercase text-lg font-bold`}>
+            {subscription.status}
+        </span>
+      </h1>
+      <div className='mb-3'>
+        <div className='flex justify-between items-end mb-3'>
+          <div>
+            <div className='text-gray-500'>Plan</div>
+            <div className='text-xl'>{subscription.plan.displayName}</div>
           </div>
-
-          {subscription.data.status !== 'CANCELED' ? (
-            <div>
-              <div className='flex'>
-                <ChangePlanButton
-                  subscriptionUuid={uuid}
-                  planUuid={subscription.data.planUuid === salableProPlanUuid ? salableBasicPlanUuid : salableProPlanUuid}
-                  planName={subscription.data.planUuid === salableProPlanUuid ? 'Basic plan' : 'Pro plan'}
-                />
-                <CancelPlanButton subscriptionUuid={uuid}/>
-              </div>
-            </div>
-          ) : null}
-        </>
-      ) : subscription.error ? (
-        <FetchError error={subscription.error}/>
+        </div>
+      </div>
+      {subscription.status !== 'CANCELED' ? (
+        <div>
+          <div className='flex'>
+            <ChangePlanButton
+              subscriptionUuid={subscription.uuid}
+              planUuid={subscription.planUuid === salableProPlanUuid ? salableBasicPlanUuid : salableProPlanUuid}
+              planName={subscription.planUuid === salableProPlanUuid ? 'Basic plan' : 'Pro plan'}
+            />
+            <CancelPlanButton subscriptionUuid={subscription.uuid}/>
+          </div>
+        </div>
       ) : null}
-    </div>
+    </>
   )
 }
 
-const Seats = async ({uuid}: { uuid: string }) => {
-  const session = await getSession();
-  if (!session) redirect('/')
-  const subscription = await getOneSubscription(uuid)
+const Seats = async ({uuid, subscription, session}: { uuid: string, subscription: SalableSubscription, session: Session }) => {
   const seats = await getAllLicenses({
     subscriptionUuid: uuid,
-    status: subscription.data?.status === 'CANCELED' ? 'canceled' : 'active'
+    status: subscription.status === 'CANCELED' ? 'canceled' : 'active'
   })
-  if (seats.error) {
-    return <FetchError error={seats.error}/>
-  }
+  if (seats.error) return <FetchError error={seats.error}/>
   const users = await getAllUsers(session.organisationUuid)
-  if (users.error) {
-    return <FetchError error={users.error} />
-  }
+  if (users.error) return <FetchError error={users.error}/>
   const nonLicensedUsers = users.data?.reduce((arr: User[], user) => {
     if (!user.username) return arr
     if (!seats.data?.data.find((s) => s.granteeId === user.uuid)) arr.push(user)
@@ -128,7 +122,7 @@ const Seats = async ({uuid}: { uuid: string }) => {
                 if (b.granteeId === null) return -1
                 return 0
               }).map((l, i) => {
-                if (l.granteeId === null && subscription.data?.status === 'CANCELED') return null
+                if (l.granteeId === null && subscription.status === 'CANCELED') return null
                 const assignedUser = users.data.find((u) => u.uuid === l.granteeId) ?? null
                 return (
                   <React.Fragment key={`licenses_${i}`}>
@@ -144,7 +138,7 @@ const Seats = async ({uuid}: { uuid: string }) => {
                 );
               })}
             </div>
-            {pendingInvitesOnSubscription?.length && subscription.data?.status === 'ACTIVE' ? (
+            {pendingInvitesOnSubscription?.length && subscription.status === 'ACTIVE' ? (
               <div className='mt-6'>
                 <h2 className='text-lg'>Pending Invites</h2>
                 <div className='mt-3 flex flex-col rounded-sm shadow bg-white'>
@@ -165,7 +159,7 @@ const Seats = async ({uuid}: { uuid: string }) => {
                   })}
                 </div>
               </div>
-            ) : subscription.data?.status === 'CANCELED' ? (
+            ) : subscription.status === 'CANCELED' ? (
               <div className='mt-2 text-gray-500 text-sm'>Assigned seats at subscription cancellation</div>
             ) : null}
           </>
@@ -173,19 +167,6 @@ const Seats = async ({uuid}: { uuid: string }) => {
       </div>
       <InviteUserModal session={session} revalidatePage={`/dashboard/subscriptions/${uuid}`} />
     </>
-  )
-}
-
-const UpdateSubscriptionPanel = async ({uuid}: { uuid: string }) => {
-  const subscription = await getOneSubscription(uuid)
-  return (
-    <div>
-      {subscription.data ? (
-        <UpdateSubscription seatCount={subscription.data.quantity} subscription={subscription.data}/>
-      ) : subscription.error ? (
-        <FetchError error={subscription.error}/>
-      ) : null}
-    </div>
   )
 }
 
@@ -268,37 +249,6 @@ const SeatsLoading = () => {
     </div>
   )
 }
-
-const UpdateSubscriptionPanelLoading = () => (
-  <div className='flex flex-col rounded-md border-gray-300 border-2 p-4'>
-    <h2 className='text-xl text-center mb-2'>Update seat count</h2>
-    <div className='mb-2 text-center'>
-      To change the seat count you will need to update your subscription which will incur a change to your billing.
-    </div>
-    <div className='border-b-2 flex justify-center items-center pb-4 animate-pulse'>
-      <div className='h-[38px] w-[38px] bg-slate-300 rounded-full'/>
-      <div className='h-[28px] w-[18px] bg-slate-300 mx-4 rounded-md'/>
-      <div className='h-[38px] w-[38px] bg-slate-300 rounded-full'/>
-    </div>
-    <div className='border-b-2 flex justify-between items-end py-4'>
-      <div>
-        <div className='text-gray-500'>Current Plan</div>
-        <div className='h-[28px] w-[75px] bg-slate-300 rounded-md'/>
-      </div>
-      <div>
-        <div className='h-[20px] w-[100px] bg-slate-300 rounded-md'/>
-      </div>
-    </div>
-    <div className='flex justify-between pt-4'>
-      <div className='text-xl text-gray-500'>Current total</div>
-      <div className='flex flex-col items-end'>
-        <div className='h-[28px] w-[100px] bg-slate-300 rounded-md'/>
-        <div className='h-[16px] w-[50px] bg-slate-300 rounded-md mt-1'/>
-      </div>
-    </div>
-    <div className='h-[46px] w-full bg-slate-300 rounded-md mt-3'/>
-  </div>
-)
 
 const SubscriptionLoading = () => {
   return (
