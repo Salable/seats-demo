@@ -6,6 +6,7 @@ import {Session} from "@/app/actions/sign-in";
 import {cookies} from "next/headers";
 import {licenseCheck} from "@/fetch/licenses/check";
 import {env} from "@/app/environment";
+import {Result} from "@/app/actions/checkout-link";
 
 const zodCreateStringRequestBody = z.object({
   bytes: z.union([z.literal('16'), z.literal('32'), z.literal('64'), z.literal('128')]),
@@ -13,7 +14,7 @@ const zodCreateStringRequestBody = z.object({
 
 type CreateStringRequestBody = z.infer<typeof zodCreateStringRequestBody>
 
-export const generateString = async (formData: CreateStringRequestBody) =>{
+export const generateString = async (formData: CreateStringRequestBody): Promise<Result<string>> =>{
   try {
     const data = zodCreateStringRequestBody.parse(formData)
     const session = await getIronSession<Session>(await cookies(), { password: env.SESSION_COOKIE_PASSWORD, cookieName: env.SESSION_COOKIE_NAME });
@@ -25,7 +26,6 @@ export const generateString = async (formData: CreateStringRequestBody) =>{
     }
     const bytes = Number(data.bytes)
     if (!bytes) return {data: null, error: 'Invalid bytes size'};
-
     const check = await licenseCheck(session.uuid)
     if (!check.data?.capabilities.find((c) => c.capability === formData.bytes)) {
       return {
@@ -33,9 +33,15 @@ export const generateString = async (formData: CreateStringRequestBody) =>{
         error: 'Unauthorised'
       }
     }
-    return randomBytes(bytes).toString('hex');
+    return {
+      data: randomBytes(bytes).toString('hex'),
+      error: null
+    }
   } catch (e) {
     console.error(e)
-    return {error: 'Unknown error'}
+    return {
+      data: null,
+      error: 'Failed to generate string'
+    }
   }
 }

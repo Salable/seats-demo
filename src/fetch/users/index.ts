@@ -71,3 +71,10 @@ export async function getAllUsers(organisationUuid: string): Promise<Result<Pris
     }
   }
 }
+
+export async function isUserAdmin(userUuid: string, organisationUuid: string) {
+  const userOnOrg = await prismaClient.usersOnOrganisations.findFirst({
+    where: {userUuid, organisationUuid}
+  })
+  return !!userOnOrg?.isAdmin
+}

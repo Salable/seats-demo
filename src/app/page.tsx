@@ -1,6 +1,6 @@
 import {licenseCheck} from "@/fetch/licenses/check";
 import React, {Suspense} from "react";
-import {StringGeneratorForm} from "@/components/forms/string-generator-form";
+import {LicenseCheckResponse, StringGeneratorForm} from "@/components/forms/string-generator-form";
 import {getSession} from "@/fetch/session";
 import {bytes, salableApiBaseUrl} from "@/app/constants";
 import {env} from "@/app/environment";
@@ -11,6 +11,7 @@ import {FetchError} from "@/components/fetch-error";
 import Link from "next/link";
 import {LockIcon} from "@/components/icons/lock-icon";
 import LoadingSpinner from "@/components/loading-spinner";
+import {isUserAdmin} from "@/fetch/users";
 
 export const metadata = {
   title: 'Salable Per Seat Demo',
@@ -49,20 +50,22 @@ export default async function Home({searchParams}: {
 }
 
 const StringGenerator = async ({search}: { search: Record<string, string> }) => {
+  let isAdmin = false
+  let check: Result<LicenseCheckResponse | null> = {
+    data: null, error: null
+  }
   const session = await getSession();
   if (search.planUuid && session?.uuid) {
-    let retries = 0
     await new Promise<void>(async (resolve) => {
       while (true) {
         try {
           const licenses = await getLicenses(session, search.planUuid);
           if (licenses.error) break
-          if (licenses.data?.data[0].planUuid === search.planUuid  || retries >= 30) {
+          if (licenses.data?.data[0].planUuid === search.planUuid) {
             resolve()
             break
           }
           await new Promise(r => setTimeout(r, 500));
-          retries++
         } catch (e) {
           console.log(e)
           break
@@ -70,40 +73,67 @@ const StringGenerator = async ({search}: { search: Record<string, string> }) => 
       }
     })
   }
-  const check = session?.uuid ? await licenseCheck(session.uuid) : {
-    data: null, error: null
+  if (session?.uuid) {
+    isAdmin = await isUserAdmin(session.uuid, session.organisationUuid)
+    check = await licenseCheck(session.uuid)
   }
   return (
     <>
       {!check.error ? (
         <>
           <StringGeneratorForm check={check.data} />
-
           {check.data && !check.data.capabilities.find((c) => c.capability === '128') ? (
             <div className='flex justify-center'>
-              <div className='rounded-md inline-flex flex-col mx-auto mt-6 p-3 border-2'>
+              <div className='max-w-[400px] rounded-md inline-flex flex-col mx-auto mt-6 p-3 border-2'>
                 <p>
-                  Upgrade to Pro to unlock <span className='font-bold'>128 Byte strings</span>
+                  {isAdmin ? "Upgrade to Pro ": "Contact your organisation's admin to upgrade to Pro "}
+                  to unlock <span className='font-bold'>128 Byte strings</span>
                 </p>
                 <div className='flex mt-2'>
+                  {isAdmin ? (
+                    <Link
+                      href={'/dashboard/subscriptions'}
+                      className='p-3 text-white rounded-md leading-none font-bold bg-blue-700 hover:bg-blue-800 transition'
+                    >
+                      Upgrade now
+                    </Link>
+                  ) : (
+                    <Link
+                      href='/dashboard/organisations'
+                      className='inline-block p-3 text-white rounded-md leading-none font-bold bg-blue-700 hover:bg-blue-800 transition'
+                    >
+                      Organisation
+                    </Link>
+                  )}
+                </div>
+              </div>
+            </div>
+          ) : null}
+          {!check.data && isAdmin ? (
+            <div className='flex justify-center max-w-[400px] mx-auto'>
+              <div className='rounded-md inline-flex flex-col mx-auto mt-6 p-3 border-2'>
+                <p>To start creating secure strings subscribe to a plan from our pricing table and get started!</p>
+                <div className='mt-3'>
                   <Link
-                    href={'/dashboard/subscriptions'}
-                    className='p-3 text-white rounded-md leading-none font-bold bg-blue-700 hover:bg-blue-800 transition'
+                    href='/pricing'
+                    className='inline-block p-3 text-white rounded-md leading-none font-bold bg-blue-700 hover:bg-blue-800 transition'
                   >
-                    Upgrade now
+                    Pricing
                   </Link>
                 </div>
               </div>
             </div>
           ) : null}
-
-          {!check.data ? (
+          {!check.data && !isAdmin ? (
             <div className='flex justify-center max-w-[400px] mx-auto'>
               <div className='rounded-md inline-flex flex-col mx-auto mt-6 p-3 border-2'>
-                <p>To start creating secure strings subscribe to a plan from our pricing table and get started!</p>
+                <p>Contact your organisation admin to get access</p>
                 <div className='mt-3'>
-                  <Link href='/pricing' className='inline-block p-3 text-white rounded-md leading-none font-bold bg-blue-700 hover:bg-blue-800 transition'>
-                    Pricing
+                  <Link
+                    href='/dashboard/organisations'
+                    className='inline-block p-3 text-white rounded-md leading-none font-bold bg-blue-700 hover:bg-blue-800 transition'
+                  >
+                    Organisation
                   </Link>
                 </div>
               </div>
@@ -111,7 +141,7 @@ const StringGenerator = async ({search}: { search: Record<string, string> }) => 
           ) : null}
         </>
       ) : (
-        <FetchError error={check.error} />
+        <FetchError error={check.error}/>
       )}
     </>
   )
@@ -131,7 +161,7 @@ const Loading = () => {
         </div>
       ))}
       <div>
-        <div className='h-[20px] w-[20px]'>
+      <div className='h-[20px] w-[20px]'>
           <LoadingSpinner fill={'#000'} />
         </div>
       </div>

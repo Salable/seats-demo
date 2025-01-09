@@ -23,20 +23,17 @@ export const StringGeneratorForm = ({check}: {check: LicenseCheckResponse | null
     ...(check && {defaultValues: {bytes: '16'}}),
     mode: 'onChange'
   })
-
   const onSubmit: SubmitHandler<{
     bytes: Bytes
   }> = async (formData) => {
     const randomString = await generateString(formData)
-    if (typeof randomString === 'string') {
-      setRandomString(randomString)
-    } else {
+    if (randomString.error) {
       toast.error(randomString.error)
+    } else {
+      setRandomString(randomString.data)
     }
   }
-
   const bytes: Bytes[] = ['16', '32', '64', '128']
-
   const Byte = ({size, capability}: {size: string; capability: boolean}) => {
     return (
       <>
@@ -57,7 +54,6 @@ export const StringGeneratorForm = ({check}: {check: LicenseCheckResponse | null
       </>
     )
   }
-
   return (
     <div>
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -66,7 +62,6 @@ export const StringGeneratorForm = ({check}: {check: LicenseCheckResponse | null
           {bytes.map((byte, index) => (
             <Byte size={byte} capability={!!check?.capabilities.find((c) => c.capability === byte)} key={`${byte}-${index}`} />
           ))}
-
           {check ? (
             <button
               className={`p-3 text-white rounded-md leading-none font-bold bg-blue-700 hover:bg-blue-800 transition text-sm`}
@@ -74,10 +69,8 @@ export const StringGeneratorForm = ({check}: {check: LicenseCheckResponse | null
             >{!isSubmitting ? "Generate" :
               <div className='w-[15px]'><LoadingSpinner fill="white"/></div>}</button>
           ) : null}
-
         </div>
       </form>
-
       {randomString ? (
         <div className='mt-6 relative text-center flex justify-center'>
           <pre className='p-2 leading-none truncate text-lg text-center bg-white rounded-l-full'>{randomString}</pre>
@@ -111,4 +104,3 @@ const CopyButton = ({text}: {text: string}) => {
     </button>
   )
 }
-

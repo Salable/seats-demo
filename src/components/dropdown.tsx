@@ -18,7 +18,6 @@ export const Dropdown = ({user}: {user: Prisma.UserGetPayload<{
     setDropDownOpen(false)
   }
   useOnClickOutside(ref, clickOutside)
-
   return (
     <>
       {user?.username ? (
@@ -31,7 +30,6 @@ export const Dropdown = ({user}: {user: Prisma.UserGetPayload<{
           </button>
           {dropDownOpen && (
             <div ref={ref} className='absolute flex flex-col right-0 top-[45px] bg-white width-max-content text-right w-[200px] rounded-sm shadow z-10'>
-              <div className='p-3 block f-full border-b text-sm text-center'>Hello, {user.username}</div>
               <Link className='p-3 block f-full border-b hover:bg-gray-50 text-sm' href={'/dashboard/organisations'} onClick={() => setDropDownOpen(false)}>Organisation</Link>
               {user.organisations[0].isAdmin ? (
                 <Link className='p-3 block f-full border-b hover:bg-gray-50 text-sm' href={'/dashboard/subscriptions'} onClick={() => setDropDownOpen(false)}>Subscriptions</Link>

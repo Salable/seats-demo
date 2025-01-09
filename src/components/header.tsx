@@ -16,7 +16,6 @@ export const Header = async () => {
     )
   }
   const user = await getOneUser(session.uuid, session.organisationUuid);
-
   return (
     <HeaderWrapper>
       <div className="flex justify-between items-center">
@@ -39,8 +38,9 @@ const HeaderWrapper = ({children}: { children: React.ReactNode}) => {
     <header className='bg-white px-6'>
       <div className='max-w-[1500px] m-auto py-4 flex justify-between items-center'>
         <Link className='flex items-center' href='/'>
-          <div className='w-[30px] mr-2'><SalableLogo/></div>
-          <span>Salable Per Seat Demo</span>
+          <div className='w-[30px]'><SalableLogo/></div>
+          <span className='w-[2px] h-[20px] bg-gray-200 mx-4' />
+          <span className='text-gray-600'>Per Seat Demo</span>
         </Link>
         <div>{children}</div>
       </div>

@@ -7,6 +7,7 @@ import React, {Suspense} from "react";
 import {getSession} from "@/fetch/session";
 import {licenseCheck} from "@/fetch/licenses/check";
 import {FetchError} from "@/components/fetch-error";
+import {isUserAdmin} from "@/fetch/users";
 
 export const metadata = {
   title: 'Pricing',
@@ -22,9 +23,10 @@ export default async function Pricing() {
             <div className='flex items-end mb-1'>
               <div className='text-3xl mr-2'>
                 <span className='font-bold'>£1</span>
-                <span className='text-xl'> / per month</span>
+                <span className='text-xl'> / per seat</span>
               </div>
             </div>
+            <div className='text-xs'>per month</div>
           </div>
           <p className='text-gray-500 text-lg mb-4'>
             Everything you need to start building secure strings.
@@ -53,12 +55,13 @@ export default async function Pricing() {
             <div className='flex items-end mb-1'>
               <div className='text-3xl mr-2'>
                 <span className='font-bold'>£2</span>
-                <span className='text-xl'> / per month</span>
+                <span className='text-xl'> / per seat</span>
               </div>
             </div>
+            <div className='text-xs'>per month</div>
           </div>
           <p className='text-gray-500 text-lg mb-4'>
-            Everything you need to start building secure strings.
+            Everything you will ever need to build secure strings.
           </p>
           <div className='mb-6'>
             <div className='flex items-center'>
@@ -94,6 +97,14 @@ const BasicPlanPricingTableButton = async () => {
       >
         Sign up
       </Link>
+    )
+  }
+  const isAdmin = await isUserAdmin(session.uuid, session.organisationUuid)
+  if (!isAdmin) {
+    return (
+      <div className='block p-4 text-gray-700 rounded-md leading-none font-bold bg-gray-200 transition w-full text-center'>
+        Contact organisation admin
+      </div>
     )
   }
   const check = session?.uuid ? await licenseCheck(session.uuid) : {
@@ -143,6 +154,14 @@ const ProPlanPricingTableButton = async () => {
   if (check.error) {
     return (
       <FetchError error='Failed to create button' />
+    )
+  }
+  const isAdmin = await isUserAdmin(session.uuid, session.organisationUuid)
+  if (!isAdmin) {
+    return (
+      <div className='block p-4 text-gray-700 rounded-md leading-none font-bold bg-gray-200 transition w-full text-center'>
+        Contact organisation admin
+      </div>
     )
   }
   return (

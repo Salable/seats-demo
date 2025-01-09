@@ -35,7 +35,6 @@ export const AssignUser = (
   }
   useOnClickOutside(ref, clickOutside)
   const handleClickAssignSeat = (granteeId: string) => async () => {
-    console.log(1)
     try {
       setShowUsers(false)
       setIsUpdatingUser(true)
