@@ -52,7 +52,6 @@ export async function signUp(formData: SignUpRequestBody, planUuid: string | nul
         error: 'Sign up failed'
       }
     }
-
     const salt = randomBytes(16).toString('hex');
     const hash = hashString(data.password, salt)
     const organisation = await prismaClient.organisation.create({

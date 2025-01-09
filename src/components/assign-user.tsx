@@ -35,6 +35,7 @@ export const AssignUser = (
   }
   useOnClickOutside(ref, clickOutside)
   const handleClickAssignSeat = (granteeId: string) => async () => {
+    console.log(1)
     try {
       setShowUsers(false)
       setIsUpdatingUser(true)
@@ -74,23 +75,19 @@ export const AssignUser = (
     history.pushState(null, '', `?${params.toString()}`)
   }
   return (
-    <div className={`border-b-2`} ref={ref}>
+    <div className='border-b-2 relative'>
       <div className='p-3 flex justify-between'>
         <div>
-          <button
-            className={`flex items-center ${!isUser && subscriptionStatus !== 'CANCELED' ? 'cursor-pointer' : ''}`}
+          <div
+            className='flex items-center'
             aria-label={assignedUser?.username ? 'Reassign seat' : 'Assign seat'}
-            onClick={() => {
-              if (!isUser) setShowUsers(!showUsers)
-            }}
-            disabled={subscriptionStatus === 'CANCELED'}
           >
             <div className='rounded-full mr-3'>
-              <div className='w-[38px] h-[38px] cursor-pointer rounded-full bg-blue-200 leading-none flex items-center justify-center'>
+              <div className='w-[38px] h-[38px] rounded-full bg-blue-200 leading-none flex items-center justify-center'>
                 <span>{!isPending ? assignedUser?.username?.[0].toUpperCase() : "?"}</span>
               </div>
             </div>
-            <div className='text-left'>
+            <div className='text-left' ref={ref}>
               {assignedUser?.username ? (
                 <div>{assignedUser.username}</div>
               ) : null}
@@ -99,31 +96,39 @@ export const AssignUser = (
                   {isUpdatingUser ? (
                     <div className='h-[14px] w-[14px]'><LoadingSpinner fill='#000000'/></div>
                   ) : (
-                    <div>Assign Seat</div>
+                    <button
+                      className='p-2 border-2 rounded-md text-gray-500 text-xs font-bold'
+                      onClick={() => {
+                        if (!isUser) setShowUsers(!showUsers)
+                      }}
+                      disabled={subscriptionStatus === 'CANCELED'}
+                    >
+                      Assign user
+                    </button>
                   )}
+                  {showUsers ? (
+                    <div className='absolute z-10 border-2 bg-white'>
+                      {nonLicensedUsers.map((user, i) => (
+                        <button
+                          className='flex items-center p-2 cursor-pointer hover:bg-gray-200 text-xs w-full' key={`${i}_assign_users`}
+                          aria-label={`Assign seat to user ${user.username}`}
+                          onClick={handleClickAssignSeat(user.uuid)}
+                        >
+                          <div className='rounded-full mr-3'>
+                            <div className='w-[24px] h-[24px] text-sm cursor-pointer rounded-full bg-blue-200 leading-none flex items-center justify-center'>
+                              <span className='text-xs'>{user.username?.[0].toUpperCase()}</span>
+                            </div>
+                          </div>
+                          <div>{user.username}</div>
+                        </button>
+                      ))}
+                    </div>
+                  ) : null}
                 </>
               ) : null}
               {assignedUser ? <div className='text-xs text-gray-500'>{assignedUser.email}</div> : null}
             </div>
-          </button>
-          {showUsers ? (
-            <div className='absolute border-2 bg-white'>
-              {nonLicensedUsers.map((user, i) => (
-                <button
-                  className='flex items-center p-2 cursor-pointer hover:bg-gray-200 text-xs w-full' key={`${i}_assign_users`}
-                  aria-label={`Assign seat to user ${user.username}`}
-                  onClick={handleClickAssignSeat(user.uuid)}
-                >
-                  <div className='rounded-full mr-3'>
-                    <div className='w-[24px] h-[24px] text-sm cursor-pointer rounded-full bg-blue-200 leading-none flex items-center justify-center'>
-                      <span className='text-xs'>{user.username?.[0].toUpperCase()}</span>
-                    </div>
-                  </div>
-                  <div>{user.username}</div>
-                </button>
-              ))}
-            </div>
-          ) : null}
+          </div>
         </div>
         <div className='flex items-center'>
           {isPending ? (

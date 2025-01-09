@@ -117,7 +117,6 @@ const LoadingSkeleton = () => {
   return (
     <div>
       <div className="mb-4 h-2 bg-slate-300 rounded w-[100px]"></div>
-
       {[...new Array(4)].map((_, index) => (
         <div className="shadow rounded-sm p-4 w-full bg-white mx-auto border-b-2" key={`loading-${index}`}>
           <div className="animate-pulse flex w-full">
@@ -132,7 +131,6 @@ const LoadingSkeleton = () => {
           </div>
         </div>
       ))}
-
       <div className='flex justify-end mt-4'>
         <div className='w-[98px] h-[46px] rounded-md bg-slate-300 animate-pulse'></div>
       </div>

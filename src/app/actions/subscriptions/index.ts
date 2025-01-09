@@ -75,17 +75,15 @@ export const changeSubscription = async (subscriptionUuid: string, planUuid: str
         error: 'Failed to update subscription'
       }
     }
-    let retries = 0
     await new Promise<void>(async (resolve) => {
       while (true) {
         try {
           const subscription = await getOneSubscription(subscriptionUuid)
-          if (subscription.data?.planUuid === planUuid || retries >= 30) {
+          if (subscription.data?.planUuid === planUuid) {
             resolve()
             break
           }
           await new Promise(r => setTimeout(r, 500));
-          retries++
         } catch (e) {
           console.log(e)
           break
@@ -96,7 +94,6 @@ export const changeSubscription = async (subscriptionUuid: string, planUuid: str
     console.error(e)
     return {data: null, error: 'Failed to update subscription'}
   }
-
   revalidatePath(`/dashboard/subscriptions/${subscriptionUuid}`)
 }
 
@@ -125,17 +122,15 @@ export const addSeats = async ({
       }
     }
     const data = await res.json() as SalableEventResponse
-    let retries = 0
     await new Promise<void>(async (resolve) => {
       while (true) {
         try {
           const event = await getOneEvent(data.eventUuid)
-          if (event.data?.status === 'success' || retries >= 30) {
+          if (event.data?.status === 'success' || event.data?.status === 'failed') {
             resolve()
             break
           }
           await new Promise(r => setTimeout(r, 500));
-          retries++
         } catch (e) {
           console.log(e)
           break
@@ -183,16 +178,15 @@ export const removeSeats = async ({
     }
     const data = await res.json() as SalableEventResponse
     await new Promise<void>(async (resolve) => {
-      let retries = 0
       while (true) {
         try {
           const event = await getOneEvent(data.eventUuid)
-          if (event.data?.status === 'success' || retries >= 30) {
+          if (event.data?.status === 'success' || event.data?.status === 'failed') {
             resolve()
             break
           }
+          // if its failed break out of it
           await new Promise(r => setTimeout(r, 500));
-          retries++
         } catch (e) {
           console.log(e)
           break
@@ -227,17 +221,15 @@ export const cancelSubscription = async (subscriptionUuid: string) => {
         error: 'Failed to cancel subscription'
       }
     }
-    let retries = 0
     await new Promise<void>(async (resolve) => {
       while (true) {
         try {
           const subscription = await getOneSubscription(subscriptionUuid)
-          if (subscription.data?.status === 'CANCELED' || retries >= 30) {
+          if (subscription.data?.status === 'CANCELED') {
             resolve()
             break
           }
           await new Promise(r => setTimeout(r, 500));
-          retries++
         } catch (e) {
           console.log(e)
           break
