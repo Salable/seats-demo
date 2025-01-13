@@ -34,7 +34,7 @@ User details are stored in a Turso database, and passwords are securely hashed w
 1. Clone the project
 2. Run `npm install`
 3. Configure the environment variables with `cp .env.example .env`
-5. Run `prisma db push`
+5. Run `npx prisma db push`
 
 ### Configure Salable
 1. [Sign up](https://salable.app/login) to Salable or [login](https://salable.app/login) if you already have an account.
