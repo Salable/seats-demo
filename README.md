@@ -33,16 +33,7 @@ User details are stored in a Turso database, and passwords are securely hashed w
 ### Project set up
 1. Clone the project
 2. Run `npm install`
-3. Copy `.env.example` and paste as `.env`
-4. Add the below to your `.env`
-    ```
-    TURSO_DATABASE_URL='file:dev.db'
-    TURSO_AUTH_TOKEN='xxxxx'
-    NEXT_PUBLIC_APP_BASE_URL='http://localhost:3000'
-    SESSION_COOKIE_NAME='salable-session-flat-rate'
-    SESSION_COOKIE_PASSWORD='Q2cHasU797hca8iQ908vsLTdeXwK3BdY'
-    NEXT_PUBLIC_SALABLE_API_BASE_URL='https://api.salable.app'
-    ```
+3. Configure the environment variables with `cp .env.example .env`
 5. Run `prisma db push`
 
 ### Configure Salable
