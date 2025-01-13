@@ -1,4 +1,4 @@
-![Salable Per Seat Pricing Demo](https://raw.githubusercontent.com/Salable/seats-demo/refs/heads/main/public/per-seat-banner.gif?token=GHSAT0AAAAAACMKGD32XKFIHZB4DU63EEVCZ33WN6A)
+![Salable Per Seat Pricing Demo](https://raw.githubusercontent.com/Salable/seats-demo/refs/heads/main/public/per-seat-banner.gif)
 
 This app demonstrates using [per seat](https://www.salable.app/features/per-seat-pricing) billing with Salable.
 
@@ -88,4 +88,6 @@ User details are stored in a Turso database, and passwords are securely hashed w
 ## Need some help?
 Get answers and guidance from our own developers and commercial model consultants. If you have an implementation query, or you are not sure which pricing model to use for your app, our people are ready to help.
 
-[![Join salable discord](https://raw.githubusercontent.com/Salable/seats-demo/refs/heads/main/public/discord-button.png?token=GHSAT0AAAAAACMKGD33B5SG37YQVMV2H6KMZ33WN2Q)](https://discord.com/channels/1064480618546737163/1219751191483781214)
+<a href="https://discord.com/channels/1064480618546737163/1219751191483781214">
+<img alt="Join the salable discord" src="https://raw.githubusercontent.com/Salable/seats-demo/refs/heads/main/public/discord-button.png" width="258" />
+</a>
