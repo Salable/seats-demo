@@ -64,7 +64,7 @@ User details are stored in a Turso database, and passwords are securely hashed w
 7. Select `Paid` to make it a paid plan.
 8. Currencies will then appear, input the per seat cost of the plan’s subscription which will be billed to a customer every month.
 9. Continue to `Assign values`.
-10. This is section is for assigning feature values that can be used on pricing tables. This is not required to get set up. Learn more about features (LINK)
+10. This is section is for assigning feature values that can be used on pricing tables. This is not required to get set up.
 11. Click continue to `Capabilities`.
 12. Create three capabilities of `16`, `32` and `64`. These will be used to lock features behind the license check in the demo app.
 13. Create Plan.
