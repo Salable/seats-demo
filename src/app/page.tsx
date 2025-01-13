@@ -109,7 +109,7 @@ const StringGenerator = async ({search}: { search: Record<string, string> }) => 
               </div>
             </div>
           ) : null}
-          {!check.data && isAdmin ? (
+          {!session?.uuid || !check.data && isAdmin ? (
             <div className='flex justify-center max-w-[400px] mx-auto'>
               <div className='rounded-md inline-flex flex-col mx-auto mt-6 p-3 border-2'>
                 <p>To start creating secure strings subscribe to a plan from our pricing table and get started!</p>
@@ -124,7 +124,7 @@ const StringGenerator = async ({search}: { search: Record<string, string> }) => 
               </div>
             </div>
           ) : null}
-          {!check.data && !isAdmin ? (
+          {session?.uuid && !check.data && !isAdmin ? (
             <div className='flex justify-center max-w-[400px] mx-auto'>
               <div className='rounded-md inline-flex flex-col mx-auto mt-6 p-3 border-2'>
                 <p>Contact your organisation admin to get access</p>

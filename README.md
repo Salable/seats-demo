@@ -12,7 +12,7 @@ This app demonstrates using [per seat](https://www.salable.app/features/per-seat
 
 ## Demo
 
-[View demo](https://flat-rate-demo.vercel.app/)
+[View demo](https://seats-demo.vercel.app/)
 
 The product in the demo generates strings with random data which vary in size based on the number of bytes selected. To get access to the product a user must sign up and subscribe to a plan. The email of the sign up does not have to be real, this is just for demo purposes. The byte sizes for the strings are feature locked behind different plans. Once a user has subscribed they will be able access some or all of these features depending on what plan they are licensed on.
 
