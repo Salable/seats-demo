@@ -6,9 +6,8 @@ This app demonstrates using [per seat](https://www.salable.app/features/per-seat
 - [Next.js](http://Next.js)
 - [Vercel](https://vercel.com/docs)
 - [Iron sessions](https://github.com/vvo/iron-session)
-- [Turso (DB)](https://turso.tech/)
 - [Prisma (ORM)](https://www.prisma.io/)
-- [Turso + Prisma](https://www.prisma.io/docs/orm/overview/databases/turso) ⚠️ Warning: using Turso with Prisma is currently experimental
+- [Neon on Vercel (DB)](https://neon.tech/docs/guides/vercel-overview)
 
 ## Demo
 
@@ -36,8 +35,6 @@ User details are stored in a Turso database, and passwords are securely hashed w
 3. Copy `.env.example` and paste as `.env`
 4. Add the below to your `.env`
     ```
-    TURSO_DATABASE_URL='file:dev.db'
-    TURSO_AUTH_TOKEN='xxxxx'
     NEXT_PUBLIC_APP_BASE_URL='http://localhost:3000'
     SESSION_COOKIE_NAME='salable-session-flat-rate'
     SESSION_COOKIE_PASSWORD='Q2cHasU797hca8iQ908vsLTdeXwK3BdY'
