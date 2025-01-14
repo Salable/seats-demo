@@ -35,12 +35,15 @@ User details are stored in a Turso database, and passwords are securely hashed w
 3. Copy `.env.example` and paste as `.env`
 4. Add the below to your `.env`
     ```
+    DATABASE_URL="postgresql://admin:password@localhost:5432/demo-seats-db"
     NEXT_PUBLIC_APP_BASE_URL='http://localhost:3000'
     SESSION_COOKIE_NAME='salable-session-flat-rate'
     SESSION_COOKIE_PASSWORD='Q2cHasU797hca8iQ908vsLTdeXwK3BdY'
     NEXT_PUBLIC_SALABLE_API_BASE_URL='https://api.salable.app'
     ```
-5. Run `prisma db push`
+5. [Install Docker](https://www.docker.com/get-started/). If you already have Docker installed skip this step.
+6. Run `docker-compose up -d`
+7. Run `prisma db push`
 
 ### Configure Salable
 1. [Sign up](https://salable.app/login) to Salable or [login](https://salable.app/login) if you already have an account.
