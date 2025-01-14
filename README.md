@@ -37,7 +37,7 @@ User details are stored in a Turso database, and passwords are securely hashed w
     ```
     DATABASE_URL="postgresql://admin:password@localhost:5432/demo-seats-db"
     NEXT_PUBLIC_APP_BASE_URL='http://localhost:3000'
-    SESSION_COOKIE_NAME='salable-session-flat-rate'
+    SESSION_COOKIE_NAME='salable-session-seats'
     SESSION_COOKIE_PASSWORD='Q2cHasU797hca8iQ908vsLTdeXwK3BdY'
     NEXT_PUBLIC_SALABLE_API_BASE_URL='https://api.salable.app'
     ```
