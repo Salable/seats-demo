@@ -48,6 +48,32 @@ swap out the included authentication system with theirs.
 1. Clone the repo (`git clone git@github.com:Salable/seats-demo.git`)
 2. Run `npm install`
 3. Create an `.env` file (`cp .env.example .env`)
+4. [Install Docker](https://www.docker.com/get-started/). If you already have Docker installed skip this step. If you don't want to run Docker for local development skip to the next stage for an alternative.
+5. Run `docker-compose up -d`
+6. Run `npx prisma db push`
+
+### Alternative to Docker
+If you are using Docker skip to [Configure Salable](#configure-salable).
+To remove the requirement of Docker we will change the db provider to `sqlite`.
+1. Update the datasource in the `schema.prisma` file in the root of the project to use the provider `"sqlite"`
+   ```
+   datasource db {  
+      provider = "sqlite"  
+      url = env("DATABASE_URL")
+   }
+   ```
+2. Update the `DATABASE_URL` var in your `.env` file to be `file:./dev.db`
+3. Replace the contents of `./prisma/index.ts` with the code below -
+   ```typescript
+   import { PrismaClient } from "@prisma/client";
+   import { PrismaLibSQL } from "@prisma/adapter-libsql";
+   import { createClient } from "@libsql/client";
+   import { env } from "@/app/environment";
+   
+   const libsql = createClient({ url: env.DATABASE_URL });
+   const adapter = new PrismaLibSQL(libsql);
+   export const prismaClient = new PrismaClient({ adapter });
+   ```
 4. Run `npx prisma db push`
 
 ### Configure Salable
