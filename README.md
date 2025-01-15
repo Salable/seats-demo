@@ -39,11 +39,35 @@ User details are stored in a Turso database, and passwords are securely hashed w
     NEXT_PUBLIC_APP_BASE_URL='http://localhost:3000'
     SESSION_COOKIE_NAME='salable-session-seats'
     SESSION_COOKIE_PASSWORD='Q2cHasU797hca8iQ908vsLTdeXwK3BdY'
-    NEXT_PUBLIC_SALABLE_API_BASE_URL='https://api.salable.app'
     ```
-5. [Install Docker](https://www.docker.com/get-started/). If you already have Docker installed skip this step.
+5. [Install Docker](https://www.docker.com/get-started/). If you already have Docker installed skip this step. If you don't want to run Docker for local development skip to the next stage.
 6. Run `docker-compose up -d`
-7. Run `prisma db push`
+7. Run `npx prisma db push`
+
+### Alternative to Docker
+If you are using Docker skip to [Configure Salable](#configure-salable).
+
+To remove the requirement of Docker we will change the db provider to `sqlite`. 
+1. Update the datasource in the `schema.prisma` file in the root of the project to use the provider `"sqlite"`
+   ```
+   datasource db {  
+      provider = "sqlite"  
+      url = env("DATABASE_URL")
+   }
+   ```
+2. Update the `DATABASE_URL` var in your `.env` file to be `file:./dev.db`
+3. Replace the contents of `./prisma/index.ts` with the code below -
+   ```typescript
+   import { PrismaClient } from "@prisma/client";
+   import { PrismaLibSQL } from "@prisma/adapter-libsql";
+   import { createClient } from "@libsql/client";
+   import { env } from "@/app/environment";
+   
+   const libsql = createClient({ url: env.DATABASE_URL });
+   const adapter = new PrismaLibSQL(libsql);
+   export const prismaClient = new PrismaClient({ adapter });
+   ```
+4. Run `npx prisma db push`
 
 ### Configure Salable
 1. [Sign up](https://salable.app/login) to Salable or [login](https://salable.app/login) if you already have an account.
@@ -71,8 +95,7 @@ User details are stored in a Turso database, and passwords are securely hashed w
 14. Repeat the above steps for a `Pro` plan but with the changes in the next steps.
 15. Set the plan name to `Pro`.
 16. Set a higher monthly cost to the `Basic` plan.
-17. Set the minimum amount of seats to `4`.
-18. Select all capabilities `16`, `32` and `64` and create a new capability of `128`.
+17. Select all capabilities `16`, `32` and `64` and create a new capability of `128`.
 
 ### Update project .env
 1. Go back to `Products`.
