@@ -18,15 +18,15 @@ This demo application showcases Salable's
 The product in the demo generates strings with random data which vary in size
 based on the number of bytes selected. To get access to the product a user must
 sign up and subscribe to a plan. The byte sizes for the strings are feature
-locked behind different plans. Once a user has subscribed they will be able
+locked behind different plans. Once a user has subscribed they will be able to 
 access some or all of these features depending on what plan they are licensed
 on.
 
-The email of the sign up does not have to be real, this is just for demo
+The email of the sign-up does not have to be real, this is just for demo
 purposes.
 
-The demo is integrated with Stripe to handle payments and is running in test
-mode so a fake/demonstration card can be used.
+The demo is integrated with Stripe to handle payments which is running in test
+mode so Stripe test cards can be used.
 
 ### Demo Card Details
 
@@ -37,7 +37,7 @@ mode so a fake/demonstration card can be used.
 
 ## Auth
 
-User details are stored in the Turso database, and passwords are securely hashed
+User details are stored in a postgres database using Neon with Vercel. Passwords are securely hashed
 with unique salts. The ID of the logged-in user is used as the `granteeId` when
 creating a license on Salable. It is also used for the license checks. If you're
 developing an app within an existing ecosystem like Trello or Slack, you can
@@ -50,45 +50,45 @@ swap out the included authentication system with theirs.
 3. Create an `.env` file (`cp .env.example .env`)
 4. Run `npx prisma db push`
 
-1. [Sign up](https://salable.app/login) for Salable or [Login](https://salable.app/login) if you already have an account.
-1. Ensure you have "Test Mode" enabled.
+### Configure Salable
+
+1. [Sign up](https://salable.app/login) for Salable or [login](https://salable.app/login) if you already have an account.
+2. Ensure you have `Test Mode` enabled.
 
 #### Create Product
 
-1. Go to the Products page and click the "Create Product" button.
-1. Give your product any name.
-1. Tick the `Paid Product` checkbox.
-1. Select the test payment integration that is created for you on sign up. If you already have created a payment integration this can be used instead.
-1. Select whichever default currency you'd prefer.
+1. Go to the Products page and click the `Create Product` button.
+2. Give your product any name.
+3. Tick the `Paid Product` checkbox.
+4. Select the test payment integration that is created for you on sign up. If you already have created a payment integration this can be used instead.
+5. Select whichever default currency you'd prefer.
 
 #### Create Plan
 
-1. Go to the "Plans" tab on the sidebar and select "Create Plan"
-1. Set the plan name as `Basic` and optionally provide a description.
-1. Press "Continue" to configure "License Type" information.
-1. For the type of plan select `Standard`.
-1. Select `Month` for subscription cycle.
-1. Select `Per Seat` license type.
-1. Select `Paid` to make it a paid plan.
-1. Currencies will then appear, input the per seat cost of the plan’s subscription which will be billed to a customer every month.
-1. Continue to `Assign values`.
-1. This is section is for assigning feature values that can be used on pricing tables. This is not required to get set up.
-1. Click continue to `Capabilities`.
-1. Create three capabilities of `16`, `32` and `64`. These will be used to lock features behind the license check in the demo app.
-1. Create Plan.
-1. Set a higher monthly cost to the `Basic` plan.
-1. Set the minimum amount of seats to `4`.
-1. Select all capabilities `16`, `32` and `64` and create a new capability of `128`.
+1. Go to the `Plans` tab on the sidebar and select `Create Plan`
+2. Set the plan name as `Basic` and optionally provide a description.
+3. Press `Continue` to configure `License Type` information.
+4. For the type of plan select `Standard`.
+5. Select `Month` for subscription cycle.
+6. Select `Per Seat` license type.
+7. Select `Paid` to make it a paid plan.
+8. Currencies will then appear, input the per seat cost of the plan’s subscription which will be billed to a customer every month.
+9. Continue to `Assign values`.
+10. This is section is for assigning feature values that can be used on pricing tables. This is not required to get set up.
+11. Click `Continue` to `Capabilities`.
+12. Create three capabilities of `16`, `32` and `64`. These will be used to lock features behind the license check in the demo app.
+13. Create Plan.
+14. Repeat the above steps for a `Pro` plan but with the changes in the next steps.
+15. Set a higher monthly cost to the `Basic` plan.
+16. Select all capabilities `16`, `32` and `64` and create a new capability of `128`.
 
 ### Update Environment Variables
 
-1. Copy the Product ID from the "General Settings" tab and assign to
-   `NEXT_PUBLIC_PRODUCT_UUID` in the `.env` file.
-1. Go to the "Plans". Assign the `Basic` ID to `NEXT_PUBLIC_SALABLE_PLAN_UUID`
-   and the `Pro` ID to `NEXT_PUBLIC_SALABLE_PRO_PLAN_UUID`.
-1. Visit the "API Keys" page.
-1. Copy the API Key that was generated on sign up and assign to `SALABLE_API_KEY`.
-1. Run `npm run dev`
+1. Copy the Product ID from the "General Settings" tab and assign to `NEXT_PUBLIC_PRODUCT_UUID` in the `.env` file.
+2. Go to `Plans`. Assign the `Basic` ID to `NEXT_PUBLIC_SALABLE_PLAN_UUID` and the `Pro` ID to `NEXT_PUBLIC_SALABLE_PRO_PLAN_UUID`.
+3. Go to `API Keys`.
+4. Copy the API Key that was generated on sign up and assign to `SALABLE_API_KEY`.
+5. Run `npm run dev`
 
 ## Need some help?
 
