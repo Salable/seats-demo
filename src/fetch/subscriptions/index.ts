@@ -1,7 +1,7 @@
 import {env} from "@/app/environment";
 import {getIronSession} from "iron-session";
 import {cookies} from "next/headers";
-import {salableApiBaseUrl} from "@/app/constants";
+import {salableApiBaseUrl, salableProductUuid} from "@/app/constants";
 import {Session} from "@/app/actions/sign-in";
 import {getErrorMessage} from "@/app/actions/get-error-message";
 import { Result } from "@/app/actions/checkout-link";
@@ -77,6 +77,7 @@ export async function getAllSubscriptions(params?: {
       email: session.email,
       sort: 'desc',
       expand: 'plan',
+      productUuid: salableProductUuid
     });
     const res = await fetch(`${salableApiBaseUrl}/subscriptions?${fetchParams.toString()}`, {
       headers: { 'x-api-key': env.SALABLE_API_KEY, version: 'v2', cache: 'no-cache' },
