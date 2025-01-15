@@ -46,6 +46,8 @@ User details are stored in a Turso database, and passwords are securely hashed w
 
 ### Alternative to Docker
 If you are using Docker skip to [Configure Salable](#configure-salable).
+
+To remove the requirement of Docker we will change the db provider to `sqlite`. 
 1. Update the datasource in the `schema.prisma` file in the root of the project to use the provider `"sqlite"`
    ```
    datasource db {  
