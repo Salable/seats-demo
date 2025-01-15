@@ -39,7 +39,6 @@ User details are stored in a Turso database, and passwords are securely hashed w
     NEXT_PUBLIC_APP_BASE_URL='http://localhost:3000'
     SESSION_COOKIE_NAME='salable-session-seats'
     SESSION_COOKIE_PASSWORD='Q2cHasU797hca8iQ908vsLTdeXwK3BdY'
-    NEXT_PUBLIC_SALABLE_API_BASE_URL='https://api.salable.app'
     ```
 5. [Install Docker](https://www.docker.com/get-started/). If you already have Docker installed skip this step. If you want an alternative to running Docker locally skip to the next stage.
 6. Run `docker-compose up -d`
