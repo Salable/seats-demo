@@ -8,10 +8,8 @@ This demo application showcases Salable's
 - [Next.js](https://nextjs.org/)
 - [Vercel](https://vercel.com/docs)
 - [Iron Session](https://github.com/vvo/iron-session)
-- [Turso (DB)](https://turso.tech/)
 - [Prisma (ORM)](https://www.prisma.io/)
-- [Turso + Prisma](https://www.prisma.io/docs/orm/overview/databases/turso)
-  (Prisma's Turso support is currently in Early Access)
+- [Neon on Vercel (DB)](https://neon.tech/docs/guides/vercel-overview)
 
 ## Demo
 
@@ -47,14 +45,10 @@ swap out the included authentication system with theirs.
 
 ## Project Setup
 
-### Getting the code
-
 1. Clone the repo (`git clone git@github.com:Salable/seats-demo.git`)
-1. Run `npm install`
-1. Create an `.env` file (`cp .env.example .env`)
-1. Run `npx prisma db push`
-
-### Accessing Salable
+2. Run `npm install`
+3. Create an `.env` file (`cp .env.example .env`)
+4. Run `npx prisma db push`
 
 1. [Sign up](https://salable.app/login) for Salable or [Login](https://salable.app/login) if you already have an account.
 1. Ensure you have "Test Mode" enabled.
