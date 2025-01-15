@@ -40,10 +40,9 @@ User details are stored in a Turso database, and passwords are securely hashed w
     SESSION_COOKIE_NAME='salable-session-seats'
     SESSION_COOKIE_PASSWORD='Q2cHasU797hca8iQ908vsLTdeXwK3BdY'
     ```
-5. [Install Docker](https://www.docker.com/get-started/). If you already have Docker installed skip this step. If you want an alternative to running Docker locally skip to the next stage.
+5. [Install Docker](https://www.docker.com/get-started/). If you already have Docker installed skip this step. If you don't want to run Docker for local development skip to the next stage.
 6. Run `docker-compose up -d`
-7. Run `npm install -g prisma`. 
-8. Run `prisma db push`
+7. Run `npx prisma db push`
 
 ### Alternative to Docker
 If you are using Docker skip to `Configure Salable`.
@@ -55,7 +54,7 @@ If you are using Docker skip to `Configure Salable`.
    }
    ```
 2. Update the `DATABASE_URL` var in your `.env` file to be `file:./dev.db`
-3. Replace the code in the `./prisma/index.ts` file with the below -
+3. Replace the contents of `./prisma/index.ts` with the code below -
    ```typescript
    import { PrismaClient } from "@prisma/client";
    import { PrismaLibSQL } from "@prisma/adapter-libsql";
@@ -66,8 +65,7 @@ If you are using Docker skip to `Configure Salable`.
    const adapter = new PrismaLibSQL(libsql);
    export const prismaClient = new PrismaClient({ adapter });
    ```
-4. Run `npm install -g prisma`
-5. Run `prisma db push`
+4. Run `npx prisma db push`
 
 ### Configure Salable
 1. [Sign up](https://salable.app/login) to Salable or [login](https://salable.app/login) if you already have an account.
