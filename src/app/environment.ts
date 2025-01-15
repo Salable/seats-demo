@@ -1,5 +1,4 @@
 if (!process.env.SALABLE_API_KEY) throw new Error('Missing env SALABLE_API_KEY')
-if (!process.env.NEXT_PUBLIC_SALABLE_API_BASE_URL) throw new Error('Missing env NEXT_PUBLIC_SALABLE_API_BASE_URL')
 if (!process.env.SESSION_COOKIE_NAME) throw new Error('Missing env SESSION_COOKIE_NAME')
 if (!process.env.SESSION_COOKIE_PASSWORD) throw new Error('Missing env SESSION_COOKIE_PASSWORD')
 if (!process.env.DATABASE_URL) throw new Error('Missing env DATABASE_URL')
