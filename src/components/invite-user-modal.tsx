@@ -45,6 +45,7 @@ export const InviteUserModal = ({session, revalidatePage}: {
         })
         return
       }
+      reset()
       removeQueryParams()
     } catch (e) {
       console.log(e)

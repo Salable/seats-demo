@@ -1,8 +1,11 @@
-import {getOneSubscription, SalableSubscription} from "@/fetch/subscriptions";
+import {
+  getOneSubscription,
+  getSubscriptionInvoices,
+  SubscriptionExpandedPlanCurrency
+} from "@/fetch/subscriptions";
 import { salableBasicPlanUuid, salableProPlanUuid} from "@/app/constants";
 import React, {Suspense} from "react";
 import {ChangePlanButton} from "@/components/change-plan-button";
-import {getSubscriptionInvoices} from "@/app/actions/subscriptions";
 import {format} from "date-fns";
 import Link from "next/link";
 import {CancelPlanButton} from "@/components/cancel-plan-button";
@@ -61,7 +64,7 @@ export default async function SubscriptionPage({ params }: { params: Promise<{ u
   )
 }
 
-const Subscription = async ({subscription}: { subscription: SalableSubscription }) => {
+const Subscription = async ({subscription}: { subscription: SubscriptionExpandedPlanCurrency }) => {
   return (
     <>
       <h1 className='text-3xl mb-6 flex items-center'>Subscription
@@ -93,10 +96,10 @@ const Subscription = async ({subscription}: { subscription: SalableSubscription 
   )
 }
 
-const Seats = async ({uuid, subscription, session}: { uuid: string, subscription: SalableSubscription, session: Session }) => {
+const Seats = async ({uuid, subscription, session}: { uuid: string, subscription: SubscriptionExpandedPlanCurrency, session: Session }) => {
   const seats = await getAllLicenses({
     subscriptionUuid: uuid,
-    status: subscription.status === 'CANCELED' ? 'canceled' : 'active'
+    status: subscription.status === 'CANCELED' ? 'CANCELED' : 'ACTIVE'
   })
   if (seats.error) return <FetchError error={seats.error}/>
   const users = await getAllUsers(session.organisationUuid)

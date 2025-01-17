@@ -1,33 +1,15 @@
-import {env} from "@/app/environment";
-import {salableApiBaseUrl} from "@/app/constants";
 import {Result} from "@/app/actions/checkout-link";
-import {getErrorMessage} from "@/app/actions/get-error-message";
+import {salable} from "@/app/salable";
+import {Event} from "@salable/node-sdk/dist/src/types";
 
-export type SalableEvent = {
-  uuid: string
-  status: string
-}
-
-export async function getOneEvent(uuid: string): Promise<Result<SalableEvent>> {
+export async function getOneEvent(uuid: string): Promise<Result<Event>> {
   try {
-    const res = await fetch(`${salableApiBaseUrl}/events/${uuid}`, {
-      headers: { 'x-api-key': env.SALABLE_API_KEY, version: 'v2' },
-      cache: "no-store"
-    })
-    if (res.ok) {
-      const data = await res.json() as SalableEvent
-      return {
-        data,
-        error: null
-      }
-    }
-    const error = await getErrorMessage(res)
-    console.log(error)
+    const data = await salable.events.getOne(uuid);
     return {
-      data: null,
-      error: 'Failed to fetch licenses'
+      data, error: null
     }
   } catch (e) {
+    // handle salable error
     console.log(e)
     return {
       data: null,

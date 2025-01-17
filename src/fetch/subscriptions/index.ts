@@ -1,69 +1,12 @@
 import {env} from "@/app/environment";
 import {getIronSession} from "iron-session";
 import {cookies} from "next/headers";
-import {salableApiBaseUrl, salableProductUuid} from "@/app/constants";
 import {Session} from "@/app/actions/sign-in";
-import {getErrorMessage} from "@/app/actions/get-error-message";
 import { Result } from "@/app/actions/checkout-link";
+import {salable} from "@/app/salable";
+import {PaginatedSubscription, PaginatedSubscriptionInvoice, Subscription, Plan, PlanCurrency} from "@salable/node-sdk/dist/src/types";
 
-export type SalableSubscription = {
-  uuid: string,
-  paymentIntegrationSubscriptionId: string,
-  productUuid: string,
-  type: string,
-  email: string,
-  organisation: string,
-  status: string,
-  cancelAtPeriodEnd: boolean,
-  quantity: number,
-  createdAt: string,
-  updatedAt: string,
-  expiryDate: string,
-  lineItemIds : string[],
-  planUuid: string,
-  isTest: boolean,
-  plan: {
-    uuid: string,
-    name: string,
-    description: string | null,
-    displayName: string,
-    slug: string,
-    status: string,
-    isTest: boolean,
-    trialDays: number | null,
-    evaluation: boolean,
-    evalDays: number,
-    organisation: string,
-    visibility: string,
-    licenseType: string,
-    perSeatAmount: number,
-    maxSeatAmount: number,
-    interval: string,
-    length: number,
-    active: boolean,
-    planType: string,
-    pricingType: string,
-    environment: string,
-    paddlePlanId: string | null,
-    productUuid: string,
-    salablePlan: boolean,
-    updatedAt: string,
-    hasAcceptedTransaction: boolean,
-    currencies: {
-      price: number
-    }[]
-  }
-}
-
-export type GetAllSubscriptionsResponse = {
-  first: string;
-  last: string;
-  data: SalableSubscription[],
-}
-
-export async function getAllSubscriptions(params?: {
-  status?: string
-}): Promise<Result<GetAllSubscriptionsResponse>> {
+export async function getAllSubscriptions(): Promise<Result<PaginatedSubscription>> {
   try {
     const session = await getIronSession<Session>(await cookies(), { password: env.SESSION_COOKIE_PASSWORD, cookieName: env.SESSION_COOKIE_NAME });
     if (!session) {
@@ -72,30 +15,17 @@ export async function getAllSubscriptions(params?: {
         error: 'Unauthorised'
       }
     }
-    const fetchParams = new URLSearchParams({
-      ...params,
+    const data = await salable.subscriptions.getAll({
       email: session.email,
-      sort: 'desc',
-      expand: 'plan',
-      productUuid: salableProductUuid
-    });
-    const res = await fetch(`${salableApiBaseUrl}/subscriptions?${fetchParams.toString()}`, {
-      headers: { 'x-api-key': env.SALABLE_API_KEY, version: 'v2', cache: 'no-cache' },
+      expand: ['plan'],
+      // sort: 'desc',
+      // productUuid: salableProductUuid
     })
-    if (res.ok) {
-      const data = await res.json()
-      return {
-        data: data as GetAllSubscriptionsResponse,
-        error: null
-      }
-    }
-    const error = await getErrorMessage(res)
-    console.log(error)
     return {
-      data: null,
-      error: 'Failed to fetch subscriptions',
+      data, error: null
     }
   } catch (e) {
+    // handle salable error
     console.log(e)
     return {
       data: null,
@@ -104,29 +34,39 @@ export async function getAllSubscriptions(params?: {
   }
 }
 
-export async function getOneSubscription(uuid: string): Promise<Result<SalableSubscription>> {
+export type SubscriptionExpandedPlanCurrency = Subscription & {
+  plan: Plan & {
+    currencies: PlanCurrency[]
+  }
+}
+
+export async function getOneSubscription(uuid: string): Promise<Result<SubscriptionExpandedPlanCurrency>> {
   try {
-    const res = await fetch(`${salableApiBaseUrl}/subscriptions/${uuid}?expand=plan.currencies`, {
-      headers: { 'x-api-key': env.SALABLE_API_KEY, version: 'v2' },
-    })
-    if (res.ok) {
-      const data = await res.json()
-      return {
-        data: data as SalableSubscription,
-        error: null,
-      }
-    }
-    const error = await getErrorMessage(res)
-    console.log(error)
+    const data = await salable.subscriptions.getOne(uuid, {expand: ['plan.currencies']}) as SubscriptionExpandedPlanCurrency
     return {
-      data: null,
-      error: 'Failed to fetch subscription',
+      data, error: null
     }
   } catch (e) {
     console.log(e)
     return {
       data: null,
       error: 'Failed to fetch subscription',
+    }
+  }
+}
+
+export const getSubscriptionInvoices = async (subscriptionUuid: string): Promise<Result<PaginatedSubscriptionInvoice>> => {
+  try {
+    const data = await salable.subscriptions.getInvoices(subscriptionUuid)
+    return {
+      data, error: null
+    }
+  } catch (e) {
+    // handle salable error
+    console.log(e)
+    return {
+      data: null,
+      error: 'Failed to fetch subscription invoices'
     }
   }
 }
