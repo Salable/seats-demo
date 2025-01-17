@@ -22,25 +22,18 @@ export async function inviteUser(formData: CreateTokenRequestBody, revalidatePag
     const existingOrganisation = await prismaClient.organisation.findUnique({
       where: {uuid: formData.organisationUuid},
     })
-    const existingUser = await prismaClient.user.findFirst({
-      where: {
-        email: formData.email,
-      },
-      include: {
-        organisations: {
-          where: {
-            organisationUuid: formData.organisationUuid
-          }
-        }
-      }
-    })
     if (!existingOrganisation) {
       return {
         data: null,
         error: 'Invite user failed'
       }
     }
-    if (existingUser?.organisations.length) {
+    const existingUser = await prismaClient.user.findUnique({
+      where: {
+        email: formData.email,
+      }
+    })
+    if (existingUser) {
       return {
         data: null,
         error: 'Invite user failed'

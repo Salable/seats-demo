@@ -32,7 +32,7 @@ mode so Stripe test cards can be used.
 
 **Card Number**: `4242 4242 4242 4242` \
 **Expiry Date**: Any future date (`09/42`) \
-**CVC**: Any 3 digit number (`123`) \
+**CVC**: Any 3-digit number (`123`) \
 **Cardholder Name**: Anything (`Mr John Doe`)
 
 ## Auth
@@ -49,7 +49,7 @@ swap out the included authentication system with theirs.
 2. Run `npm install`
 3. Create an `.env` file (`cp .env.example .env`)
 4. [Install Docker](https://www.docker.com/get-started/). If you already have Docker installed skip this step. If you don't want to run Docker for local development skip to the next stage for an alternative.
-5. Run `docker-compose up -d`
+5. Run `docker compose up -d`
 6. Run `npx prisma db push`
 
 ### Alternative to Docker
