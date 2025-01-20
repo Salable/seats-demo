@@ -4,9 +4,20 @@ import {cookies} from "next/headers";
 import {Session} from "@/app/actions/sign-in";
 import { Result } from "@/app/actions/checkout-link";
 import {salable} from "@/app/salable";
-import {PaginatedSubscription, PaginatedSubscriptionInvoice, Subscription, Plan, PlanCurrency} from "@salable/node-sdk/dist/src/types";
+import {PaginatedSubscriptionInvoice, Subscription, Plan, PlanCurrency} from "@salable/node-sdk/dist/src/types";
+import {SalableResponseError} from "@salable/node-sdk";
 
-export async function getAllSubscriptions(): Promise<Result<PaginatedSubscription>> {
+export type SubscriptionExpandedPlan = Subscription & {
+  plan: Plan
+}
+
+export type GetAllSubscriptionsExpandedPlan = {
+  first: string;
+  last: string;
+  data: SubscriptionExpandedPlan[]
+}
+
+export async function getAllSubscriptions(): Promise<Result<GetAllSubscriptionsExpandedPlan>> {
   try {
     const session = await getIronSession<Session>(await cookies(), { password: env.SESSION_COOKIE_PASSWORD, cookieName: env.SESSION_COOKIE_NAME });
     if (!session) {
@@ -20,12 +31,11 @@ export async function getAllSubscriptions(): Promise<Result<PaginatedSubscriptio
       expand: ['plan'],
       // sort: 'desc',
       // productUuid: salableProductUuid
-    })
+    }) as GetAllSubscriptionsExpandedPlan
     return {
       data, error: null
     }
   } catch (e) {
-    // handle salable error
     console.log(e)
     return {
       data: null,
@@ -40,13 +50,19 @@ export type SubscriptionExpandedPlanCurrency = Subscription & {
   }
 }
 
-export async function getOneSubscription(uuid: string): Promise<Result<SubscriptionExpandedPlanCurrency>> {
+export async function getOneSubscription(uuid: string): Promise<Result<SubscriptionExpandedPlanCurrency | null>> {
   try {
     const data = await salable.subscriptions.getOne(uuid, {expand: ['plan.currencies']}) as SubscriptionExpandedPlanCurrency
     return {
       data, error: null
     }
   } catch (e) {
+    if (e instanceof SalableResponseError && e.code === 'S1002') {
+      return {
+        data: null,
+        error: null
+      }
+    }
     console.log(e)
     return {
       data: null,
@@ -62,7 +78,6 @@ export const getSubscriptionInvoices = async (subscriptionUuid: string): Promise
       data, error: null
     }
   } catch (e) {
-    // handle salable error
     console.log(e)
     return {
       data: null,

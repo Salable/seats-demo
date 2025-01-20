@@ -9,7 +9,6 @@ export async function getOneEvent(uuid: string): Promise<Result<Event>> {
       data, error: null
     }
   } catch (e) {
-    // handle salable error
     console.log(e)
     return {
       data: null,

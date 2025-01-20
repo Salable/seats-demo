@@ -14,7 +14,7 @@ import {getAllLicenses} from "@/fetch/licenses/get-all";
 import {AssignUser} from "@/components/assign-user";
 import {getAllUsers} from "@/fetch/users";
 import {getSession} from "@/fetch/session";
-import {redirect} from "next/navigation";
+import {notFound, redirect} from "next/navigation";
 import {User} from "@prisma/client";
 import {UpdateSubscription} from "@/components/update-subscription";
 import {InviteUserModal} from "@/components/invite-user-modal";
@@ -37,6 +37,7 @@ export default async function SubscriptionPage({ params }: { params: Promise<{ u
       </div>
     )
   }
+  if (!subscription.data) return notFound()
   if (subscription.data?.email !== session.email) redirect('/')
 
   return (

@@ -74,7 +74,6 @@ export async function inviteUser(formData: CreateTokenRequestBody, revalidatePag
       })
     }
   } catch (error) {
-    // handle salable error
     console.log(error)
     return {
       data: null,

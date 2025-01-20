@@ -24,7 +24,7 @@ export const changeSubscription = async (subscriptionUuid: string, planUuid: str
       }
     })
   } catch (e) {
-    // handle salable error
+    
     console.error(e)
     return {data: null, error: 'Failed to update subscription'}
   }
@@ -42,7 +42,6 @@ export const addSeats = async ({
     const create = await salable.subscriptions.addSeats(uuid, {increment})
     await pollSalableEvent(create.eventUuid)
   } catch (error) {
-    // handle salable error
     console.log(error)
     return {
       data: null,
@@ -64,7 +63,6 @@ export const removeSeats = async ({
     const remove = await salable.subscriptions.removeSeats(uuid, {decrement})
     await pollSalableEvent(remove.eventUuid)
   } catch (error) {
-    // handle salable error
     console.log(error)
     return {
       data: null,
@@ -94,7 +92,6 @@ export const cancelSubscription = async (subscriptionUuid: string) => {
       }
     })
   } catch (e) {
-    // handle salable error
     console.log(e)
     return {
       data: null,

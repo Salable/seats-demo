@@ -16,7 +16,6 @@ export async function updateLicense(formData: UpdateLicenseRequestBody, revalida
       granteeId: data.granteeId,
     })
   } catch (error) {
-    // handle salable error
     console.log(error)
     return {
       data: null,

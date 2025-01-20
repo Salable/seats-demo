@@ -9,7 +9,6 @@ export async function getAllLicenses(params?: GetLicenseOptions): Promise<Result
       data, error: null
     }
   } catch (e) {
-    // handle salable error
     console.log(e)
     return {
       data: null,

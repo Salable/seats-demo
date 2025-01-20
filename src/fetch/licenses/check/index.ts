@@ -14,7 +14,6 @@ export async function licenseCheck(granteeId: string): Promise<Result<CheckLicen
       error: null
     }
   } catch (e) {
-    // implement salable error handling
     console.log(e)
     return {
       data: null,
