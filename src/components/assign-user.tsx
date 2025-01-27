@@ -2,11 +2,11 @@
 import React, {useRef, useState} from "react";
 import {useOnClickOutside} from "usehooks-ts";
 import { User } from "@prisma/client";
-import {License} from "@/fetch/licenses/get-all";
 import {Session} from "@/app/actions/sign-in";
 import {updateLicense} from "@/app/actions/licenses/update";
 import {toast} from "react-toastify";
 import LoadingSpinner from "@/components/loading-spinner";
+import {License} from "@salable/node-sdk/dist/src/types";
 
 export const AssignUser = (
   {
